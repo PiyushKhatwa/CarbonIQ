@@ -267,3 +267,4 @@ def generate_complete_13_table_er_diagram():
 
 if __name__ == '__main__':
     generate_complete_13_table_er_diagram()
+

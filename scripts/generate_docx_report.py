@@ -180,11 +180,12 @@ def create_docx_report(target_docx_path=DOCX_PATH):
 
     p_inst = doc.add_paragraph()
     p_inst.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_inst.paragraph_format.space_before = Pt(48)
+    p_inst.paragraph_format.space_before = Pt(36)
     run_inst = p_inst.add_run(
         "School of Computer Science Engineering and Technology\n"
         "Bennett University, Greater Noida\n"
-        f"Academic Year: {STUDENT_DETAILS['academic_year']} | {STUDENT_DETAILS['submission_date']}"
+        f"{STUDENT_DETAILS['academic_year']}\n\n"
+        f"{STUDENT_DETAILS.get('faculty_supervisor', 'Faculty Supervisor: [To be assigned / confirmed by Department]')}"
     )
     run_inst.font.name = 'Times New Roman'
     run_inst.font.size = Pt(12)
@@ -273,20 +274,7 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     r_lot.font.size = Pt(16)
     r_lot.font.bold = True
     r_lot.font.color.rgb = COLOR_PRIMARY
-    p_lot.paragraph_format.space_after = Pt(10)
-
-    # Insert Native Automatic Word List of Tables field code
-    p_lot_field = doc.add_paragraph()
-    p_lot_field.paragraph_format.line_spacing = 1.15
-    p_lot_field.paragraph_format.space_after = Pt(8)
-    r_lot_begin = p_lot_field.add_run()
-    r_lot_begin._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="begin"/>'))
-    r_lot_instr = p_lot_field.add_run()
-    r_lot_instr._r.append(parse_xml(f'<w:instrText {nsdecls("w")} xml:space="preserve"> TOC \\h \\z \\c "Table" </w:instrText>'))
-    r_lot_sep = p_lot_field.add_run()
-    r_lot_sep._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="separate"/>'))
-    r_lot_end = p_lot_field.add_run()
-    r_lot_end._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="end"/>'))
+    p_lot.paragraph_format.space_after = Pt(12)
 
     tables_meta = [
         ("Table 2.1", "Comparative Analysis of Existing Carbon Accounting Solutions versus CarbonIQ", "8"),
@@ -298,36 +286,25 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         p_row = doc.add_paragraph()
         p_row.paragraph_format.line_spacing = 1.15
         p_row.paragraph_format.space_after = Pt(4)
+        pPr = p_row._p.get_or_add_pPr()
+        pPr.append(parse_xml(f'<w:tabs {nsdecls("w")}><w:tab w:val="right" w:leader="dot" w:pos="9360"/></w:tabs>'))
         r1 = p_row.add_run(f"{num}: {cap}")
         r1.font.name = 'Times New Roman'
         r1.font.size = Pt(11)
-        p_row.add_run(" " + "." * max(5, 75 - len(num) - len(cap)) + " ")
-        r2 = p_row.add_run(pg)
+        r_tab = p_row.add_run("\t")
+        r2 = p_row.add_run(str(pg))
         r2.font.name = 'Times New Roman'
         r2.font.size = Pt(11)
         r2.font.bold = True
 
     p_lof = doc.add_paragraph()
-    p_lof.paragraph_format.space_before = Pt(20)
+    p_lof.paragraph_format.space_before = Pt(24)
     r_lof = p_lof.add_run("LIST OF FIGURES")
     r_lof.font.name = 'Times New Roman'
     r_lof.font.size = Pt(16)
     r_lof.font.bold = True
     r_lof.font.color.rgb = COLOR_PRIMARY
-    p_lof.paragraph_format.space_after = Pt(10)
-
-    # Insert Native Automatic Word List of Figures field code
-    p_lof_field = doc.add_paragraph()
-    p_lof_field.paragraph_format.line_spacing = 1.15
-    p_lof_field.paragraph_format.space_after = Pt(8)
-    r_lof_begin = p_lof_field.add_run()
-    r_lof_begin._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="begin"/>'))
-    r_lof_instr = p_lof_field.add_run()
-    r_lof_instr._r.append(parse_xml(f'<w:instrText {nsdecls("w")} xml:space="preserve"> TOC \\h \\z \\c "Figure" </w:instrText>'))
-    r_lof_sep = p_lof_field.add_run()
-    r_lof_sep._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="separate"/>'))
-    r_lof_end = p_lof_field.add_run()
-    r_lof_end._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="end"/>'))
+    p_lof.paragraph_format.space_after = Pt(12)
 
     figures_meta = [
         ("Figure 3.1", "CarbonIQ Four-Tier Decoupled System Architecture", "10"),
@@ -335,21 +312,23 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         ("Figure 3.3", "CarbonIQ Relational Entity Relationship Diagram (Crow's Foot 3NF)", "14"),
         ("Figure 3.4", "Activity Logging & Deterministic Emission Calculation Workflow", "19"),
         ("Figure 3.5", "Privacy-Preserving AI Advisory & Offline Fallback Workflow", "21"),
-        ("Figure 4.1", "CarbonIQ Public Landing Page & Quick-Fill Authentication", "29"),
-        ("Figure 4.2", "Executive Carbon Footprint Overview Dashboard", "30"),
-        ("Figure 4.3", "Add Activity Modal Wizard with Real-Time Calculation Preview", "31"),
-        ("Figure 4.4", "Emissions Analytics, Departmental Breakdown & CSV Export", "32"),
-        ("Figure 4.5", "Carbon Reduction Goals Tracking & AI Insights Advisory", "32")
+        ("Figure 4.1", "Illustrative Public Landing Page & Quick-Fill Authentication Layout", "29"),
+        ("Figure 4.2", "Illustrative Executive Carbon Footprint Overview Dashboard Layout", "30"),
+        ("Figure 4.3", "Illustrative Add Activity Modal Wizard Layout with Real-Time Preview", "31"),
+        ("Figure 4.4", "Illustrative Emissions Analytics & Departmental Breakdown Layout", "32"),
+        ("Figure 4.5", "Illustrative Carbon Reduction Goals & AI Advisory Interface Layout", "32")
     ]
     for num, cap, pg in figures_meta:
         p_row = doc.add_paragraph()
         p_row.paragraph_format.line_spacing = 1.15
         p_row.paragraph_format.space_after = Pt(4)
+        pPr = p_row._p.get_or_add_pPr()
+        pPr.append(parse_xml(f'<w:tabs {nsdecls("w")}><w:tab w:val="right" w:leader="dot" w:pos="9360"/></w:tabs>'))
         r1 = p_row.add_run(f"{num}: {cap}")
         r1.font.name = 'Times New Roman'
         r1.font.size = Pt(11)
-        p_row.add_run(" " + "." * max(5, 75 - len(num) - len(cap)) + " ")
-        r2 = p_row.add_run(pg)
+        r_tab = p_row.add_run("\t")
+        r2 = p_row.add_run(str(pg))
         r2.font.name = 'Times New Roman'
         r2.font.size = Pt(11)
         r2.font.bold = True
