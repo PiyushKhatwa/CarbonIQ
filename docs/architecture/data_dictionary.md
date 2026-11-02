@@ -193,3 +193,4 @@ Automated active database trigger-maintained record of table modifications.
 | `new_state` | JSONB | NULL | Row contents after insert/update |
 | `ip_address` | VARCHAR(45) | NULL | Client IP if passed from application layer |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `CURRENT_TIMESTAMP` | Audit log creation timestamp |
+

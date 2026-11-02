@@ -180,8 +180,8 @@ BEGIN
         v_curr_count
     FROM activities a
     JOIN emission_records er ON a.id = er.activity_id
-    WHERE (p_user_id IS NOT NULL AND a.user_id = p_user_id)
-       OR (p_organization_id IS NOT NULL AND a.organization_id = p_organization_id)
+    WHERE ((p_user_id IS NOT NULL AND a.user_id = p_user_id)
+       OR (p_organization_id IS NOT NULL AND a.organization_id = p_organization_id))
       AND a.activity_date BETWEEN p_start_date AND p_end_date;
 
     -- Previous comparable period aggregates
@@ -193,8 +193,8 @@ BEGIN
         v_prev_count
     FROM activities a
     JOIN emission_records er ON a.id = er.activity_id
-    WHERE (p_user_id IS NOT NULL AND a.user_id = p_user_id)
-       OR (p_organization_id IS NOT NULL AND a.organization_id = p_organization_id)
+    WHERE ((p_user_id IS NOT NULL AND a.user_id = p_user_id)
+       OR (p_organization_id IS NOT NULL AND a.organization_id = p_organization_id))
       AND a.activity_date BETWEEN v_prev_start AND v_prev_end;
 
     -- Calculate percentage change
@@ -212,3 +212,4 @@ BEGIN
         v_change;
 END;
 $$ LANGUAGE plpgsql;
+

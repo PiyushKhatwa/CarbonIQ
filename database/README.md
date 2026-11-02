@@ -130,3 +130,4 @@ DROP DATABASE IF EXISTS carboniq_db;
 CREATE DATABASE carboniq_db;
 ```
 Then re-apply the migrations and seeds in order.
+

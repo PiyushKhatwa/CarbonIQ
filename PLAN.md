@@ -10,10 +10,10 @@
 
 | Phase | Description | Status | Completion Date |
 |---|---|---|---|
-| **Phase 0** | Repository Initialization, Architecture & Plan Approval | **IN PROGRESS** | Current |
-| **Phase 1** | ER Diagram, Data Dictionary & Normalized Database Schema | **IN PROGRESS** | Current |
-| **Phase 2** | PostgreSQL Migrations, Seeds & Advanced ADBMS Features | **PENDING** | - |
-| **Phase 3** | Express Backend, Auth, Workspace Guard & Deterministic Engine | **PENDING** | - |
+| **Phase 0** | Repository Initialization, Architecture & Plan Approval | **COMPLETED** | 2026-11-02 |
+| **Phase 1** | ER Diagram, Data Dictionary & Normalized Database Schema | **COMPLETED** | 2026-11-02 |
+| **Phase 2** | PostgreSQL Migrations, Seeds & Advanced ADBMS Features | **COMPLETED** | 2026-11-02 |
+| **Phase 3** | Express Backend, Auth, Workspace Guard & Deterministic Engine | **READY TO START** | - |
 | **Phase 4** | Python FastAPI AI Service & Local Rule-Based Fallback Engine | **PENDING** | - |
 | **Phase 5** | React 18 + Tailwind SaaS Frontend & Activity Wizard | **PENDING** | - |
 | **Phase 6** | E2E Integration, ADBMS Verification Suite & Academic Polish | **PENDING** | - |
@@ -33,18 +33,17 @@
 - [x] Create monorepo directory scaffolding (`frontend/`, `backend/`, `ai-service/`, `database/`, `docs/`, `tests/`).
 
 ### Phase 1 & 2: Database Schema, Migrations & Advanced ADBMS Features
-- [ ] Guide / confirm PostgreSQL installation and local service startup.
-- [ ] Create `carboniq_db` database locally.
-- [x] Author Migration `001_initial_schema.sql` (UUID, tables, foreign keys, CHECK constraints).
-- [x] Author Migration `002_triggers_and_audit.sql` (JSONB audit logging trigger on activities and factors).
-- [x] Author Migration `003_analytical_views.sql` (Monthly, category, and department aggregation views).
-- [x] Author Migration `004_stored_procedures.sql` (Deterministic calculation procedure and summary helpers).
-- [x] Author Seed `001_taxonomies_and_factors.sql` (Verifiable factors with source citations: CEA, DEFRA, EPA).
-- [x] Author Seed `002_demo_workspace_data.sql` (Labelled demo individual and organization datasets).
-- [ ] Execute migrations and seeds against local PostgreSQL `carboniq_db`.
-- [ ] Verify all tables, constraints, triggers, and views with actual SQL test assertions.
-- [ ] Create automated ADBMS demonstration scripts (Referential integrity, Check constraint, Transaction rollback, Concurrency, `EXPLAIN ANALYZE`).
-- [x] Create `database/README.md` with visual inspection instructions (pgAdmin).
+- [x] Connect to local PostgreSQL 18 server on `localhost:5432`.
+- [x] Automatically create `carboniq_db` database locally without altering existing databases.
+- [x] Author & execute Migration `001_initial_schema.sql` (UUID, tables, foreign keys, CHECK constraints).
+- [x] Author & execute Migration `002_triggers_and_audit.sql` (JSONB audit logging trigger on activities and factors).
+- [x] Author & execute Migration `003_analytical_views.sql` (Monthly, category, and department aggregation views).
+- [x] Author & execute Migration `004_stored_procedures.sql` (Deterministic calculation procedure and summary helpers).
+- [x] Author & execute Seed `001_taxonomies_and_factors.sql` (Verifiable factors with source citations: CEA, DEFRA, EPA).
+- [x] Author & execute Seed `002_demo_workspace_data.sql` (Labelled demo individual and organization datasets).
+- [x] Execute automated verification test suite (`npm run db:verify`) with 7/7 tests passing.
+- [x] Confirm exact object count: 13 tables, 4 views, 5 custom application routines, 10 triggers, 31 indexes.
+- [x] Document database inspection and management procedures in `database/README.md`.
 
 ### Phase 3: Backend REST APIs, Auth & Scoping
 - [ ] Initialize Express backend with modular architecture (`modules/auth`, `modules/activities`, `modules/emissions`, etc.).
@@ -81,3 +80,4 @@
 - [ ] Run and document concurrency multi-submission test.
 - [ ] Capture query plans with `EXPLAIN (ANALYZE, BUFFERS)` for index optimization report.
 - [ ] Final polish, zero console errors, zero dead buttons.
+

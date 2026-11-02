@@ -251,3 +251,4 @@ FROM activities a
 JOIN emission_records er ON a.id = er.activity_id
 WHERE a.user_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 ORDER BY a.activity_date DESC;
+

@@ -11,28 +11,30 @@
 
 ---
 
-## 2. PostgreSQL Database Specifications
+## 2. PostgreSQL Database Specifications & Verified Inventory
 
 - **Database Name:** `carboniq_db`
-- **Default Port:** `5432`
-- **Primary Key Convention:** `UUID v4` generated via `gen_random_uuid()` (native in PostgreSQL 13+)
+- **Connected Engine:** PostgreSQL 18.6 on x86_64-windows (msvc-19.44.35229, 64-bit)
+- **Host / Port:** `localhost:5432`
+- **Primary Key Convention:** `UUID v4` generated via native `gen_random_uuid()`
 - **Numeric Precision:** `NUMERIC(14, 4)` for quantities and emission factors; `NUMERIC(16, 4)` for calculated CO2e kilograms.
 - **Timezone Standard:** `TIMESTAMPTZ` (UTC storage, localized in UI).
 
-### Core Relations
-1. `users`: Credentials, profiles, global role.
-2. `organizations`: Managed entities with slug and owner.
-3. `organization_members`: Junction table enforcing `UNIQUE(organization_id, user_id)` and member roles (`owner`, `admin`, `member`).
-4. `departments`: Functional units within an organization for department-level analytics.
-5. `activity_categories`: Master emission categories (`electricity`, `transportation`, `fuel`, `lpg`, `waste`).
-6. `activity_types`: Concrete activities with standard measurement units (e.g. `grid_electricity` -> `kWh`, `passenger_car_petrol` -> `km`).
-7. `emission_factor_sources`: Authoritative source citations (CEA, DEFRA, US EPA, IPCC) with publication years and reference URLs.
-8. `emission_factors`: Versioned factor records with validity date windows (`valid_from`, `valid_to`), geography, and status.
-9. `activities`: Recorded user/organization activities.
-10. `emission_records`: Exactly one record per activity; stores computed CO2e kg and the factor snapshot used.
-11. `goals`: Target reductions against historical baseline windows.
-12. `recommendations`: AI-generated and rule-based reduction recommendations with priority and category.
-13. `audit_logs`: Trigger-maintained record of table modifications including actor ID, operation (`INSERT`, `UPDATE`, `DELETE`), and before/after JSONB payloads.
+### Verified Database Object Count (Post-Migration & Post-Seed)
+- **Base Tables (13):**
+  `activities`, `activity_categories`, `activity_types`, `audit_logs`, `departments`, `emission_factor_sources`, `emission_factors`, `emission_records`, `goals`, `organization_members`, `organizations`, `recommendations`, `users`.
+- **Views (4):**
+  `v_activities_detailed`, `v_category_emissions`, `v_department_emissions`, `v_monthly_emissions`.
+- **Custom Application Routines (5):**
+  1. `sp_record_activity_with_emissions` (Procedural atomic calculator & recorder)
+  2. `fn_get_workspace_summary` (Table-valued comparative KPI aggregator)
+  3. `fn_audit_activity_changes` (Active trigger function for activity logging)
+  4. `fn_audit_factor_changes` (Active trigger function for factor provenance)
+  5. `fn_update_timestamp` (Automated `updated_at` maintenance)
+- **Active Triggers (10):**
+  Attached to `activities` (`trg_audit_activities`, `trg_activities_updated_at`), `emission_factors` (`trg_audit_emission_factors`), `users`, `organizations`, and `goals`.
+- **Indexes (31):**
+  Covering primary keys, unique constraints, foreign keys, and multi-tenant time-series filter paths (`idx_activities_user_date`, `idx_activities_org_date`, `idx_activities_dept_date`, `idx_factors_lookup`, `idx_audit_entity`).
 
 ---
 
@@ -61,3 +63,4 @@
   - Backend: `http://localhost:5000`
   - AI Service: `http://localhost:8000`
   - PostgreSQL: `localhost:5432` (`carboniq_db`)
+

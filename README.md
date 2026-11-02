@@ -57,3 +57,4 @@ CarbonIQ/
 4. **pgAdmin 4** (Recommended for visual inspection)
 
 See [database/README.md](file:///c:/Users/piyus/Desktop/advance%20database%20mangement%20system/ADBMS_project_co2_tracker/CarbonIQ/database/README.md) for detailed database provisioning and management instructions.
+

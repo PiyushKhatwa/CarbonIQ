@@ -253,3 +253,4 @@ VALUES
         'ai_gemini',
         '671.6 kg CO2e from diesel combustion'
     );
+

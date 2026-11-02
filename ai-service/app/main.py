@@ -103,3 +103,4 @@ def generate_insights(req: InsightRequest):
         source_engine="rule_based_fallback",
         disclaimer="Recommendations are informational and generated based on verified activity metrics."
     )
+

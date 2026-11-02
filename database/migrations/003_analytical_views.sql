@@ -112,3 +112,4 @@ JOIN emission_records er ON a.id = er.activity_id
 LEFT JOIN departments d ON a.department_id = d.id
 WHERE a.organization_id IS NOT NULL
 GROUP BY a.organization_id, d.id, d.name;
+

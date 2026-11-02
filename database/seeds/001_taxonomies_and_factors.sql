@@ -125,3 +125,4 @@ VALUES
     ('44444444-4444-4444-4444-444444444412', '33333333-3333-3333-3333-333333333312', '22222222-2222-2222-2222-222222222202', 0.010200, 'kg CO2e/kg', 'India', '2023-01-01', NULL, 'v2023.1', TRUE)
 ON CONFLICT (activity_type_id, geography, version_tag) DO UPDATE 
 SET factor_value = EXCLUDED.factor_value, is_verified = EXCLUDED.is_verified;
+

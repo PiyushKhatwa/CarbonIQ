@@ -261,3 +261,4 @@ CREATE INDEX IF NOT EXISTS idx_org_members_org ON organization_members (organiza
 
 -- Audit query optimization
 CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_logs (entity_type, entity_id, created_at DESC);
+

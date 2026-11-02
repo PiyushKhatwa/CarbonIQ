@@ -152,3 +152,4 @@ CREATE TRIGGER trg_audit_emission_factors
 AFTER INSERT OR UPDATE OR DELETE ON emission_factors
 FOR EACH ROW
 EXECUTE FUNCTION fn_audit_factor_changes();
+
