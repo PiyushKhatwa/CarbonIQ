@@ -9,3 +9,4 @@ router.get('/types', taxonomyController.getActivityTypes);
 router.get('/factors', taxonomyController.getEmissionFactors);
 
 module.exports = router;
+

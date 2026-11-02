@@ -230,3 +230,4 @@ Refreshes recommendations based on the highest emitting categories in the active
 
 ### `PATCH /api/v1/recommendations/:id/status`
 Updates recommendation status to `'completed'` or `'dismissed'`.
+

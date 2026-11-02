@@ -50,3 +50,4 @@ module.exports = {
   requireAuth,
   requireRole,
 };
+

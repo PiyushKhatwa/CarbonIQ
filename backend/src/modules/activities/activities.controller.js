@@ -53,3 +53,4 @@ module.exports = {
   updateActivity,
   deleteActivity,
 };
+

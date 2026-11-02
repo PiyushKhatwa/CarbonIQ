@@ -85,3 +85,4 @@ module.exports = {
   getActivityTypes,
   getEmissionFactors,
 };
+

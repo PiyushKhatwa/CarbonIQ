@@ -12,3 +12,4 @@ router.get('/me', requireAuth, authController.getMe);
 router.patch('/me', requireAuth, validate(updateProfileSchema), authController.updateMe);
 
 module.exports = router;
+

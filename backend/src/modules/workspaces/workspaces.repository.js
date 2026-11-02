@@ -24,3 +24,4 @@ async function getUserOrganizations(userId) {
 module.exports = {
   getUserOrganizations,
 };
+

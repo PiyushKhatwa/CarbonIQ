@@ -15,3 +15,4 @@ router.get('/breakdown', requireAuth, resolveWorkspaceScope, emissionsController
 router.get('/departments', requireAuth, resolveWorkspaceScope, emissionsController.getDepartments);
 
 module.exports = router;
+

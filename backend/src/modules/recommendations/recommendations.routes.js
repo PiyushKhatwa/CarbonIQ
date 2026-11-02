@@ -23,3 +23,4 @@ router.post('/refresh', recController.refreshRecommendations);
 router.patch('/:id/status', validate(statusSchema), recController.updateStatus);
 
 module.exports = router;
+

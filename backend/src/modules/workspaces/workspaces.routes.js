@@ -7,3 +7,4 @@ const router = Router();
 router.get('/', requireAuth, workspacesController.getWorkspaces);
 
 module.exports = router;
+

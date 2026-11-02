@@ -17,3 +17,4 @@ module.exports = {
   getActivityTypes,
   getEmissionFactors,
 };
+

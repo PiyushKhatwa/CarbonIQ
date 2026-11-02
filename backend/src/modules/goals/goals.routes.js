@@ -14,3 +14,4 @@ router.post('/', validate(createGoalSchema), goalsController.createGoal);
 router.patch('/:id/status', validate(updateGoalStatusSchema), goalsController.updateGoalStatus);
 
 module.exports = router;
+

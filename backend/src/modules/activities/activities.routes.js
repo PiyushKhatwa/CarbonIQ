@@ -21,3 +21,4 @@ router.patch('/:id', validate(updateActivitySchema), activitiesController.update
 router.delete('/:id', activitiesController.deleteActivity);
 
 module.exports = router;
+

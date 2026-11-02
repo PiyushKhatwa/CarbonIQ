@@ -44,3 +44,4 @@ module.exports = {
   updateActivitySchema,
   listActivitiesSchema,
 };
+

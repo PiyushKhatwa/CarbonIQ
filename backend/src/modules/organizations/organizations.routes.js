@@ -23,3 +23,4 @@ router.get('/:id/departments', requireAuth, orgController.getDepartments);
 router.post('/:id/departments', requireAuth, validate(createDepartmentSchema), orgController.createDepartment);
 
 module.exports = router;
+

@@ -23,3 +23,4 @@ function calculateEmissions(quantity, factorValue) {
 module.exports = {
   calculateEmissions,
 };
+

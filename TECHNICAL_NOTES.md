@@ -73,7 +73,30 @@ Executed via `npm run test:api` (`tests/backend_api_test.js`):
 
 ---
 
-## 4. Advanced Database Features for ADBMS Demonstration
+## 4. Frontend UI/UX Architecture & Design System (Phase 4 Verified)
+
+### Design Direction & Color Tokens
+- **Theme:** Modern environmental SaaS identity (`#176B4D` primary forest green, `#104B38` deep forest, `#DDF3E8` accent mint, `#F7F9F7` surface off-white, `#18231E` charcoal text).
+- **Typography:** Inter sans-serif with readable weights and generous component spacing.
+- **Charts:** Interactive Recharts `AreaChart` (trajectory gradients) and `PieChart` (categorical donut breakdown).
+- **Icons:** Lucide-React icons (`Zap`, `Car`, `Flame`, `Container`, `Trash2`, `Sparkles`, `Target`, `Building2`).
+
+### Frontend Component Architecture
+- **Context State Providers:**
+  - `AuthContext`: Tracks JWT token in `localStorage`, user session, login/registration, and profile updates.
+  - `WorkspaceContext`: Multi-tenant switcher managing `personal` vs `organization` workspaces. Automatically syncs `x-workspace-type` and `x-organization-id` headers for all API calls.
+- **Interactive "Add Activity" Wizard (`AddActivityModal`):**
+  - Category selector tabs with visual icons.
+  - Activity type dynamic dropdown matching the active category.
+  - Contextual unit hint (`kWh`, `km`, `litres`, `kg`).
+  - Real-time debounced preview calling `POST /api/v1/emissions/preview` showing live footprint and factor citation before saving.
+  - Atomic persistence in PostgreSQL upon submit.
+- **Production Bundle Verification:**
+  - `vite build` completed cleanly, bundling 2,303 modules without errors.
+
+---
+
+## 5. Advanced Database Features for ADBMS Demonstration
 
 1. **ACID Transaction Guarantee & Rollback:**
    An atomic multi-table transaction inserts an `activity` and its corresponding `emission_record`. If calculation fails or an invalid foreign key / constraint violation occurs mid-transaction, an automatic `ROLLBACK` prevents orphan activity rows.
