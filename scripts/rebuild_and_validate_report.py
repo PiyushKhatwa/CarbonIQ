@@ -22,10 +22,11 @@ import report_content
 DOCS_DIR = os.path.join(os.path.dirname(__file__), '..', 'docs')
 TEMP_DOCX = os.path.join(DOCS_DIR, 'CarbonIQ_Final_Project_Report_TEMP.docx')
 FINAL_DOCX = os.path.join(DOCS_DIR, 'CarbonIQ_Final_Project_Report.docx')
+SUBMISSION_DOCX = os.path.join(DOCS_DIR, 'CarbonIQ_Final_Submission.docx')
 
 def rebuild_and_validate():
     print("==============================================================================")
-    print("CARBONIQ REPORT FINAL ACADEMIC QA & VALIDATION PIPELINE")
+    print("CARBONIQ REPORT FINAL ACADEMIC QA & SUBMISSION-READINESS PIPELINE")
     print("==============================================================================")
 
     # Step 1: Generate temporary docx
@@ -128,24 +129,29 @@ def rebuild_and_validate():
         print("Error details:", result.stderr)
         raise RuntimeError(f"Microsoft Word rejected the document: {result.stdout.strip()}")
 
-    # Step 5: Replace FINAL_DOCX only after successful validation
-    print(f"\n[STEP 5] All validations passed. Promoting temporary file to final path:\n         {FINAL_DOCX}")
+    # Step 5: Replace FINAL_DOCX and create SUBMISSION_DOCX
+    print(f"\n[STEP 5] All validations passed. Promoting temporary file to deliverables:")
+    print(f"         1. {FINAL_DOCX}")
+    print(f"         2. {SUBMISSION_DOCX}")
     shutil.copy2(TEMP_DOCX, FINAL_DOCX)
+    shutil.copy2(TEMP_DOCX, SUBMISSION_DOCX)
     os.remove(TEMP_DOCX)
+    
     final_size = os.path.getsize(FINAL_DOCX)
-    print(f"--> Successfully replaced final DOCX. Final File Size: {final_size:,} bytes ({final_size / (1024*1024):.2f} MB)")
+    sub_size = os.path.getsize(SUBMISSION_DOCX)
+    print(f"--> Successfully created final DOCX files. Size: {final_size:,} bytes ({final_size / (1024*1024):.2f} MB)")
 
-    # Step 6: Final Verification: Opening finalized DOCX via Word
-    print("\n[STEP 6] Final Verification: Opening finalized DOCX via Word...")
+    # Step 6: Final Verification: Opening finalized submission DOCX via Word
+    print("\n[STEP 6] Final Verification: Opening finalized CarbonIQ_Final_Submission.docx via Word COM...")
     final_ps = (
         f"$word = New-Object -ComObject Word.Application; "
         f"$word.Visible = $false; "
         f"try {{ "
-        f"  $doc = $word.Documents.Open('{os.path.abspath(FINAL_DOCX)}'); "
+        f"  $doc = $word.Documents.Open('{os.path.abspath(SUBMISSION_DOCX)}'); "
         f"  $title = $doc.Paragraphs.Item(2).Range.Text.Trim(); "
         f"  $pages = $doc.ComputeStatistics(2); "
         f"  $tocCount = $doc.TablesOfContents.Count; "
-        f"  Write-Host \"VERIFIED: Final DOCX opened cleanly. Title: $title | Pages: $pages | TOCs: $tocCount\"; "
+        f"  Write-Host \"VERIFIED: Final Submission DOCX opened cleanly. Title: $title | Pages: $pages | TOCs: $tocCount\"; "
         f"  $doc.Close(); "
         f"}} catch {{ "
         f"  Write-Host 'FAILED: ' $_.Exception.Message; "
@@ -160,7 +166,7 @@ def rebuild_and_validate():
         raise RuntimeError("Final Word verification failed!")
 
     print("\n==============================================================================")
-    print("ACADEMIC QA PASS COMPLETE: DOCX REBUILT & VERIFIED 100% OPERATIONAL")
+    print("SUBMISSION-READINESS VALIDATION COMPLETE: BOTH DOCX DELIVERABLES 100% OPERATIONAL")
     print("==============================================================================")
 
 if __name__ == '__main__':

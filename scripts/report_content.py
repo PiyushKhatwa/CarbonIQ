@@ -8,7 +8,7 @@ STUDENT_DETAILS = {
     "institution": "School of Computer Science Engineering and Technology\nBennett University, Greater Noida",
     "project_type": "Academic Mini-Project Report – Advanced Database Management Systems (ADBMS)",
     "submission_date": "November 2026",
-    "academic_year": "2025–2026",
+    "academic_year": "2025–2026 [Subject to Student / Department Confirmation]",
     "students": [
         {"name": "Piyush Khatwa", "roll_number": "E23CSEU0853"},
         {"name": "Shobhit Tiwari", "roll_number": "E23CSEU0891"}

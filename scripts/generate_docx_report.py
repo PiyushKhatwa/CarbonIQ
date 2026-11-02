@@ -273,13 +273,26 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     r_lot.font.size = Pt(16)
     r_lot.font.bold = True
     r_lot.font.color.rgb = COLOR_PRIMARY
-    p_lot.paragraph_format.space_after = Pt(14)
+    p_lot.paragraph_format.space_after = Pt(10)
+
+    # Insert Native Automatic Word List of Tables field code
+    p_lot_field = doc.add_paragraph()
+    p_lot_field.paragraph_format.line_spacing = 1.15
+    p_lot_field.paragraph_format.space_after = Pt(8)
+    r_lot_begin = p_lot_field.add_run()
+    r_lot_begin._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="begin"/>'))
+    r_lot_instr = p_lot_field.add_run()
+    r_lot_instr._r.append(parse_xml(f'<w:instrText {nsdecls("w")} xml:space="preserve"> TOC \\h \\z \\c "Table" </w:instrText>'))
+    r_lot_sep = p_lot_field.add_run()
+    r_lot_sep._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="separate"/>'))
+    r_lot_end = p_lot_field.add_run()
+    r_lot_end._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="end"/>'))
 
     tables_meta = [
-        ("Table 2.1", "Comparative Analysis of Existing Carbon Accounting Solutions versus CarbonIQ", "9"),
-        ("Table 4.1", "Directory of Verified Backend REST API Endpoints", "30"),
-        ("Table 4.2", "CarbonIQ Comprehensive Automated Test Suite Verification Results", "38"),
-        ("Table 5.1", "Project Objectives Achievement and Verification Matrix", "42")
+        ("Table 2.1", "Comparative Analysis of Existing Carbon Accounting Solutions versus CarbonIQ", "8"),
+        ("Table 4.1", "Directory of Verified Backend REST API Endpoints", "29"),
+        ("Table 4.2", "CarbonIQ Comprehensive Automated Test Suite Verification Results", "35"),
+        ("Table 5.1", "Project Objectives Achievement and Verification Matrix", "38")
     ]
     for num, cap, pg in tables_meta:
         p_row = doc.add_paragraph()
@@ -295,25 +308,38 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         r2.font.bold = True
 
     p_lof = doc.add_paragraph()
-    p_lof.paragraph_format.space_before = Pt(24)
+    p_lof.paragraph_format.space_before = Pt(20)
     r_lof = p_lof.add_run("LIST OF FIGURES")
     r_lof.font.name = 'Times New Roman'
     r_lof.font.size = Pt(16)
     r_lof.font.bold = True
     r_lof.font.color.rgb = COLOR_PRIMARY
-    p_lof.paragraph_format.space_after = Pt(14)
+    p_lof.paragraph_format.space_after = Pt(10)
+
+    # Insert Native Automatic Word List of Figures field code
+    p_lof_field = doc.add_paragraph()
+    p_lof_field.paragraph_format.line_spacing = 1.15
+    p_lof_field.paragraph_format.space_after = Pt(8)
+    r_lof_begin = p_lof_field.add_run()
+    r_lof_begin._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="begin"/>'))
+    r_lof_instr = p_lof_field.add_run()
+    r_lof_instr._r.append(parse_xml(f'<w:instrText {nsdecls("w")} xml:space="preserve"> TOC \\h \\z \\c "Figure" </w:instrText>'))
+    r_lof_sep = p_lof_field.add_run()
+    r_lof_sep._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="separate"/>'))
+    r_lof_end = p_lof_field.add_run()
+    r_lof_end._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="end"/>'))
 
     figures_meta = [
-        ("Figure 3.1", "CarbonIQ Four-Tier Decoupled System Architecture", "11"),
-        ("Figure 3.2", "CarbonIQ Data Flow Diagram (DFD Level 1)", "14"),
-        ("Figure 3.3", "CarbonIQ Relational Entity Relationship Diagram (Crow's Foot 3NF)", "16"),
-        ("Figure 3.4", "Activity Logging & Deterministic Emission Calculation Workflow", "21"),
-        ("Figure 3.5", "Privacy-Preserving AI Advisory & Offline Fallback Workflow", "24"),
-        ("Figure 4.1", "CarbonIQ Public Landing Page & Quick-Fill Authentication", "31"),
-        ("Figure 4.2", "Executive Carbon Footprint Overview Dashboard", "32"),
-        ("Figure 4.3", "Add Activity Modal Wizard with Real-Time Calculation Preview", "33"),
-        ("Figure 4.4", "Emissions Analytics, Departmental Breakdown & CSV Export", "34"),
-        ("Figure 4.5", "Carbon Reduction Goals Tracking & AI Insights Advisory", "35")
+        ("Figure 3.1", "CarbonIQ Four-Tier Decoupled System Architecture", "10"),
+        ("Figure 3.2", "CarbonIQ Data Flow Diagram (DFD Level 1)", "13"),
+        ("Figure 3.3", "CarbonIQ Relational Entity Relationship Diagram (Crow's Foot 3NF)", "14"),
+        ("Figure 3.4", "Activity Logging & Deterministic Emission Calculation Workflow", "19"),
+        ("Figure 3.5", "Privacy-Preserving AI Advisory & Offline Fallback Workflow", "21"),
+        ("Figure 4.1", "CarbonIQ Public Landing Page & Quick-Fill Authentication", "29"),
+        ("Figure 4.2", "Executive Carbon Footprint Overview Dashboard", "30"),
+        ("Figure 4.3", "Add Activity Modal Wizard with Real-Time Calculation Preview", "31"),
+        ("Figure 4.4", "Emissions Analytics, Departmental Breakdown & CSV Export", "32"),
+        ("Figure 4.5", "Carbon Reduction Goals Tracking & AI Insights Advisory", "32")
     ]
     for num, cap, pg in figures_meta:
         p_row = doc.add_paragraph()

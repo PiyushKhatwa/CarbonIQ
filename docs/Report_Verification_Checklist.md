@@ -3,7 +3,7 @@
 **Project Title:** CarbonIQ – AI-Powered Carbon Emissions Footprint Tracker  
 **Course & Project Type:** Academic Mini-Project – Advanced Database Management Systems (ADBMS)  
 **Institution:** School of Computer Science Engineering and Technology, Bennett University, Greater Noida  
-**Academic Year:** 2025–2026 | **Execution Date:** November 2026  
+**Academic Year:** 2025–2026 [Subject to Student / Department Confirmation] | **Execution Date:** November 2026  
 
 **Student Authors:**
 1. **Piyush Khatwa** (University Roll Number: `E23CSEU0853`)
@@ -55,9 +55,9 @@
   - `npm run test:concurrency`: 10/10 simultaneous client transactions committed in 274 ms with zero deadlocks.
 
 ### Area 4: Project Report Quality
-- **Demonstrated Competency:** 46 pages of in-depth technical documentation in both editable Microsoft Word (`.docx`, 2.28 MB) and Markdown (`.md`, 74 KB) formats.
-- **DOCX Integrity & Word Validation:** Rebuilt through a strict validation pipeline with built-in Heading styles (`Heading 1`, `Heading 2`, `Heading 3`), native automatic Word Table of Contents field, multi-section page numbering (Roman `i, ii, iii...` for preliminary, Arabic `1, 2, 3...` for main body), and verified via Microsoft Word 16.0 COM automation (`Word.Application`). Word successfully opened and updated the finalized document with **0 errors**, confirming that the file is completely valid, editable, and uncorrupted.
-- **Figure & Diagram Quality:** 10 high-resolution (300 DPI) figures created specifically for the project, illustrating system architecture, data flows, ER modeling, transaction workflows, AI heuristics, and UI walkthroughs.
+- **Demonstrated Competency:** 46 pages of in-depth technical documentation in editable Microsoft Word formats (`CarbonIQ_Final_Submission.docx` and `CarbonIQ_Final_Project_Report.docx`, 2.68 MB each) and Markdown (`CarbonIQ_Final_Project_Report.md`, 74 KB).
+- **DOCX Integrity & Word Validation:** Rebuilt through a strict validation pipeline with built-in Heading styles (`Heading 1`, `Heading 2`, `Heading 3`), native automatic Word Table of Contents field, automatic List of Tables / Figures fields, multi-section page numbering (Roman `i, ii, iii...` for preliminary, Arabic `1, 2, 3...` for main body), and verified via Microsoft Word 16.0 COM automation (`Word.Application`). Word successfully opened, updated fields/TOC, and saved the finalized documents with **0 errors**, confirming that the files are completely valid, editable, and uncorrupted.
+- **Figure & Diagram Quality:** 10 high-resolution (300 DPI) figures created specifically for the project, including the comprehensive Figure 3.3 ER Diagram representing all 13 PostgreSQL tables, primary keys, foreign keys, and relationships, plus system architecture, data flows, transaction workflows, AI heuristics, and UI walkthroughs.
 - **Referencing Discipline:** 100% genuine citations following the Harvard Referencing Style with bidirectional citation matching.
 
 ### Area 5: Communication & Presentation
