@@ -53,31 +53,32 @@ def set_cell_background(cell, color_hex):
     cell._tc.get_or_add_tcPr().append(parse_xml(shading_xml))
 
 def add_page_number_to_footer(footer):
-    """Add dynamic page numbering to a footer."""
+    """Add dynamic page numbering to a footer using valid OpenXML run structure."""
     p = footer.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    run = p.add_run('Page ')
-    run.font.name = 'Times New Roman'
-    run.font.size = Pt(10)
-    run.font.color.rgb = COLOR_MUTED
+    r_label = p.add_run('Page ')
+    r_label.font.name = 'Times New Roman'
+    r_label.font.size = Pt(10)
+    r_label.font.color.rgb = COLOR_MUTED
 
-    fldChar1 = OxmlElement('w:fldChar')
-    fldChar1.set(qn('w:fldCharType'), 'begin')
-    instrText = OxmlElement('w:instrText')
-    instrText.set(qn('xml:space'), 'preserve')
-    instrText.text = 'PAGE'
-    fldChar2 = OxmlElement('w:fldChar')
-    fldChar2.set(qn('w:fldCharType'), 'separate')
-    fldChar3 = OxmlElement('w:fldChar')
-    fldChar3.set(qn('w:fldCharType'), 'end')
+    # In OpenXML (WordprocessingML), fldChar and instrText MUST be children of w:r (run)
+    r_page = p.add_run()
+    r_page.font.name = 'Times New Roman'
+    r_page.font.size = Pt(10)
+    r_page.font.color.rgb = COLOR_MUTED
 
-    p._p.append(fldChar1)
-    p._p.append(instrText)
-    p._p.append(fldChar2)
-    p._p.append(fldChar3)
+    fldChar1 = parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="begin"/>')
+    instrText = parse_xml(f'<w:instrText {nsdecls("w")} xml:space="preserve"> PAGE </w:instrText>')
+    fldChar2 = parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="separate"/>')
+    fldChar3 = parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="end"/>')
 
-def create_docx_report():
-    print("Initializing CarbonIQ DOCX generation...")
+    r_page._r.append(fldChar1)
+    r_page._r.append(instrText)
+    r_page._r.append(fldChar2)
+    r_page._r.append(fldChar3)
+
+def create_docx_report(target_docx_path=DOCX_PATH):
+    print(f"Initializing CarbonIQ DOCX generation -> {target_docx_path}...")
     doc = docx.Document()
 
     # 1. Page Setup: 1-inch margins
@@ -696,8 +697,8 @@ def create_docx_report():
         r_det.font.name = 'Times New Roman'
         r_det.font.size = Pt(11)
 
-    doc.save(DOCX_PATH)
-    print(f"[OK] Successfully built DOCX report at: {DOCX_PATH}")
+    doc.save(target_docx_path)
+    print(f"[OK] Successfully built DOCX report at: {target_docx_path}")
 
 def create_markdown_report():
     print("Generating CarbonIQ Markdown mirror...")
@@ -802,3 +803,4 @@ if __name__ == '__main__':
     create_docx_report()
     create_markdown_report()
     print("Report generation pipeline completed successfully!")
+

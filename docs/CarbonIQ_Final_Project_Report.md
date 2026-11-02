@@ -19,7 +19,7 @@ The core foundation of CarbonIQ is built upon PostgreSQL 18.6, demonstrating adv
 
 Empirical verification across five automated test suites comprising 54 test assertions demonstrated a 100% pass rate, validating query execution in under 0.6 milliseconds via B-tree index scans (`idx_activities_user_date`), clean subtransaction rollbacks with zero orphan entity leakage, and zero-deadlock concurrency across simultaneous multi-client transactions. CarbonIQ bridges the critical divide between database integrity, environmental compliance, and actionable AI guidance.
 
-**Keywords:** *Carbon Footprint Tracking, Advanced Database Management Systems, PostgreSQL 18, ACID Transactions, Emission Factors Provenance, Multi-Tenant Isolation, Artificial Intelligence Advisory*
+**Keywords:** *Carbon Footprint Tracking, Advanced Database Management Systems, PostgreSQL 18, ACID Transactions, Artificial Intelligence Advisory*
 
 
 ---

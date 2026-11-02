@@ -43,8 +43,6 @@ KEYWORDS = [
     "Advanced Database Management Systems",
     "PostgreSQL 18",
     "ACID Transactions",
-    "Emission Factors Provenance",
-    "Multi-Tenant Isolation",
     "Artificial Intelligence Advisory"
 ]
 
@@ -1324,3 +1322,4 @@ REFERENCES_LIST = [
         "details": "How Big is Your Environmental Footprint? Methodology and Data Sources. WWF-UK."
     }
 ]
+

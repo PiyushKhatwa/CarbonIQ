@@ -17,7 +17,7 @@
 |---|---|---|---|
 | **Cover Page** | Title, Student Names, Roll Numbers, School, University | **COMPLIANT** ✔ | Rendered on Cover Page of `.docx` and top of `.md` |
 | **Abstract** | 150–300 words covering problem, motivation, objectives, methods, results | **COMPLIANT** ✔ | 268 words, covering full technical stack and empirical outcomes |
-| **Keywords** | 4–6 relevant keywords | **COMPLIANT** ✔ | 7 verified keywords included |
+| **Keywords** | 4–6 relevant keywords | **COMPLIANT** ✔ | Exactly 5 verified keywords included: *Carbon Footprint Tracking, Advanced Database Management Systems, PostgreSQL 18, ACID Transactions, Artificial Intelligence Advisory* |
 | **Chapter 1: Introduction** | Sections 1.1 through 1.6 strictly followed | **COMPLIANT** ✔ | 1.1 Background, 1.2 Problem Statement, 1.3 Aim & Objectives, 1.4 Scope, 1.5 Motivation, 1.6 Organisation |
 | **Chapter 2: Literature Review** | Sections 2.1 through 2.4, comparative table, research gaps | **COMPLIANT** ✔ | 2.1 Intro, 2.2 Existing Systems, 2.3 Table 2.1 (7 dimensions), 2.4 Summary & Gap Identification |
 | **Chapter 3: System Design & Methodology** | Architecture, DFD, ER, Normalization, ACID, Constraints, Triggers | **COMPLIANT** ✔ | Sections 3.1.1 to 3.1.12; Figures 3.1–3.5; 1NF–3NF mathematical proofs; 13 tables; CHECK constraints |
@@ -55,7 +55,8 @@
   - `npm run test:concurrency`: 10/10 simultaneous client transactions committed in 274 ms with zero deadlocks.
 
 ### Area 4: Project Report Quality
-- **Demonstrated Competency:** 45+ pages equivalent of in-depth technical documentation in both editable Microsoft Word (`.docx`, 2.22 MB) and Markdown (`.md`, 74 KB) formats.
+- **Demonstrated Competency:** 46 pages of in-depth technical documentation in both editable Microsoft Word (`.docx`, 2.27 MB) and Markdown (`.md`, 74 KB) formats.
+- **DOCX Integrity & Word Validation:** Rebuilt through a strict validation pipeline and verified via Microsoft Word 16.0 COM automation (`Word.Application`). Word successfully opened the finalized document with **0 errors**, confirming that the file is completely valid, editable, and uncorrupted.
 - **Figure & Diagram Quality:** 10 high-resolution (300 DPI) figures created specifically for the project, illustrating system architecture, data flows, ER modeling, transaction workflows, AI heuristics, and UI walkthroughs.
 - **Referencing Discipline:** 100% genuine citations following the Harvard Referencing Style with bidirectional citation matching.
 
@@ -75,3 +76,4 @@
    - *Action:* Open `docs/CarbonIQ_Final_Project_Report.docx` in Microsoft Word to confirm that local margins, page breaks, and embedded figures align with your specific local printer/PDF margins.
 4. **Demonstration Video / Live Viva Link:**
    - *Action:* If your evaluation panel requests a recorded video demonstration link or GitHub repository URL, place the link in the report's preliminary section.
+
