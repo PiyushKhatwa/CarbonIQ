@@ -27,7 +27,7 @@ ABSTRACT_TEXT = (
     "The core foundation of CarbonIQ is built upon PostgreSQL 18.6, demonstrating advanced database concepts including full "
     "relational normalization (1NF–3NF), primary and foreign key constraints with cascaded referential integrity, domain check "
     "constraints enforcing workspace exclusivity and positive physical quantities, ACID-compliant multi-table transactions with "
-    "automatic rollback protection, in-database stored procedures (`sp_record_activity_with_emissions`), active triggers logging "
+    "automatic rollback protection, in-database stored functions (`sp_record_activity_with_emissions`), active triggers logging "
     "table modifications into JSONB audit trails, and multi-tenant analytical SQL views. The application layer features a modular "
     "Node.js/Express REST API enforcing JWT-based role authorization and strict workspace scoping headers, an asynchronous Python "
     "FastAPI microservice executing privacy-preserving carbon advisory using Google Gemini with an autonomous offline heuristic "
@@ -111,7 +111,7 @@ CHAPTER_1_CONTENT = {
                 "• Objective 4: Deploy active PostgreSQL triggers that automatically log entity modifications into a structured JSONB audit trail "
                 "(`audit_logs`), capturing before-and-after states for full forensic compliance.\n"
                 "• Objective 5: Author analytical SQL views (`v_monthly_emissions`, `v_category_emissions`, `v_department_emissions`) and stored "
-                "procedures (`sp_record_activity_with_emissions`) to optimize aggregation pipelines and enforce procedural calculations.\n"
+                "functions (`sp_record_activity_with_emissions`) to optimize aggregation pipelines and enforce procedural calculations.\n"
                 "• Objective 6: Design and benchmark B-tree indexing strategies across composite filtering paths (`user_id, activity_date DESC`), "
                 "proving query optimization via `EXPLAIN (ANALYZE, BUFFERS)` in sub-millisecond execution.\n"
                 "• Objective 7: Build a clean Node.js Express REST API layer featuring bcrypt password hashing (12 salt rounds), JWT authentication, "
@@ -269,7 +269,7 @@ CHAPTER_2_CONTENT = {
                         "None",
                         "Cloud analytical microservices",
                         "Excel PivotTables (client-side only)",
-                        "PostgreSQL stored procedures (`sp_record_activity_with_emissions`) + 4 analytical reporting views"
+                        "PostgreSQL stored functions (`sp_record_activity_with_emissions`) + 4 analytical reporting views"
                     ],
                     [
                         "AI Integration & Offline Fallback",
@@ -477,7 +477,7 @@ CHAPTER_3_CONTENT = {
                     )
                 },
                 {
-                    "subheading": "3.1.8 Advanced Database Objects: Views, Procedures and Triggers",
+                    "subheading": "3.1.8 Advanced Database Objects: Views, Stored Functions and Triggers",
                     "text": (
                         "Demonstrating advanced database engineering capabilities, CarbonIQ deploys four specialized object classes in PostgreSQL:\n\n"
                         "1. Analytical SQL Views:\n"
@@ -487,8 +487,8 @@ CHAPTER_3_CONTENT = {
                         "emissions in kilograms and metric tonnes.\n"
                         "• `v_category_emissions`: Computes category-wise emission totals, activity counts, and percentage contributions.\n"
                         "• `v_department_emissions`: Aggregates departmental footprint totals and member counts for organizational workspaces.\n\n"
-                        "2. Stored Function & In-Database Procedure:\n"
-                        "• `sp_record_activity_with_emissions`: An atomic procedural routine that accepts activity parameters, looks up the current active "
+                        "2. Stored Functions and Procedural Logic:\n"
+                        "• `sp_record_activity_with_emissions`: An atomic PL/pgSQL stored function that accepts activity parameters, looks up the current active "
                         "emission factor, performs decimal-safe multiplication, inserts both `activities` and `emission_records` rows, and returns output UUIDs "
                         "and calculated CO2e kilograms in a single database round-trip.\n"
                         "• `fn_get_workspace_summary`: A table-valued analytical function that computes comparative summary KPIs (gross footprint, period "
@@ -649,7 +649,7 @@ CHAPTER_4_CONTENT = {
                     )
                 },
                 {
-                    "title": "Listing 4.2: In-Database Stored Procedure for Deterministic Calculation (database/migrations/004_stored_procedures.sql)",
+                    "title": "Listing 4.2: In-Database Stored Function for Deterministic Calculation (database/migrations/004_stored_procedures.sql)",
                     "code": (
                         "CREATE OR REPLACE FUNCTION sp_record_activity_with_emissions(\n"
                         "    p_user_id UUID,\n"
@@ -1184,7 +1184,7 @@ CHAPTER_5_CONTENT = {
                     ],
                     [
                         "Obj 3: ACID Transaction Atomicity & Rollback Protection",
-                        "Atomic multi-table inserts in Express and Stored Procedure with rollback handling",
+                        "Atomic multi-table inserts in Express and Stored Function with rollback handling",
                         "ADBMS test suite (`npm run test:adbms` Test 4; 0 orphan rows committed)",
                         "100% ACHIEVED"
                     ],

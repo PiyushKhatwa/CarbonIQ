@@ -1,14 +1,20 @@
 """
-CarbonIQ Final Project Report Generator
-Builds both docs/CarbonIQ_Final_Project_Report.docx and docs/CarbonIQ_Final_Project_Report.md
-strictly following the prescribed university report format and ADBMS rubrics.
+CarbonIQ Final Project Report Generator (Academic QA & Automatic TOC Edition)
+Generates publication-quality Word (.docx) report adhering strictly to university specifications:
+- Times New Roman, 12 pt body, 1.5 line spacing, justified alignment, 1-inch margins
+- Built-in Word styles for Heading 1, Heading 2, Heading 3
+- Native Automatic Word Table of Contents field code
+- Multi-section layout: Cover (no page num), Preliminary (Roman i, ii, iii...), Chapters (Arabic 1, 2, 3...)
+- All 10 high-resolution figures embedded with captions
+- Shaded code listings, customized data tables, and complete Harvard citations
 """
 
 import os
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
+from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.section import WD_SECTION
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import qn, nsdecls
 
@@ -61,7 +67,6 @@ def add_page_number_to_footer(footer):
     r_label.font.size = Pt(10)
     r_label.font.color.rgb = COLOR_MUTED
 
-    # In OpenXML (WordprocessingML), fldChar and instrText MUST be children of w:r (run)
     r_page = p.add_run()
     r_page.font.name = 'Times New Roman'
     r_page.font.size = Pt(10)
@@ -81,28 +86,67 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     print(f"Initializing CarbonIQ DOCX generation -> {target_docx_path}...")
     doc = docx.Document()
 
-    # 1. Page Setup: 1-inch margins
-    sections = doc.sections
-    for section in sections:
-        section.top_margin = Inches(1.0)
-        section.bottom_margin = Inches(1.0)
-        section.left_margin = Inches(1.0)
-        section.right_margin = Inches(1.0)
-        section.different_first_page_header_footer = True
-        add_page_number_to_footer(section.footer)
-
-    # Configure Default Styles
+    # -------------------------------------------------------------
+    # CONFIGURE STYLES ACCORDING TO ACADEMIC SPECIFICATIONS
+    # -------------------------------------------------------------
+    # Normal Body Text
     style_normal = doc.styles['Normal']
     font_normal = style_normal.font
     font_normal.name = 'Times New Roman'
     font_normal.size = Pt(12)
     font_normal.color.rgb = COLOR_CHARCOAL
+    style_normal.paragraph_format.line_spacing = 1.5
+    style_normal.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    style_normal.paragraph_format.space_after = Pt(6)
+
+    # Heading 1 (Chapter Titles)
+    style_h1 = doc.styles['Heading 1']
+    font_h1 = style_h1.font
+    font_h1.name = 'Times New Roman'
+    font_h1.size = Pt(16)
+    font_h1.bold = True
+    font_h1.color.rgb = COLOR_PRIMARY
+    style_h1.paragraph_format.space_before = Pt(18)
+    style_h1.paragraph_format.space_after = Pt(8)
+    style_h1.paragraph_format.keep_with_next = True
+    style_h1.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+    # Heading 2 (Main Sections e.g., 1.1)
+    style_h2 = doc.styles['Heading 2']
+    font_h2 = style_h2.font
+    font_h2.name = 'Times New Roman'
+    font_h2.size = Pt(13)
+    font_h2.bold = True
+    font_h2.color.rgb = COLOR_SECONDARY
+    style_h2.paragraph_format.space_before = Pt(14)
+    style_h2.paragraph_format.space_after = Pt(4)
+    style_h2.paragraph_format.keep_with_next = True
+    style_h2.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+    # Heading 3 (Subsections e.g., 3.1.1)
+    style_h3 = doc.styles['Heading 3']
+    font_h3 = style_h3.font
+    font_h3.name = 'Times New Roman'
+    font_h3.size = Pt(12)
+    font_h3.bold = True
+    font_h3.color.rgb = COLOR_PRIMARY
+    style_h3.paragraph_format.space_before = Pt(10)
+    style_h3.paragraph_format.space_after = Pt(3)
+    style_h3.paragraph_format.keep_with_next = True
+    style_h3.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
 
     # -------------------------------------------------------------
-    # COVER PAGE
+    # SECTION 1: COVER PAGE (No headers/footers)
     # -------------------------------------------------------------
+    sec1 = doc.sections[0]
+    sec1.top_margin = Inches(1.0)
+    sec1.bottom_margin = Inches(1.0)
+    sec1.left_margin = Inches(1.0)
+    sec1.right_margin = Inches(1.0)
+    sec1.different_first_page_header_footer = True
+
     p_title_space = doc.add_paragraph()
-    p_title_space.paragraph_format.space_before = Pt(36)
+    p_title_space.paragraph_format.space_before = Pt(40)
 
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -147,12 +191,23 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     run_inst.font.bold = True
     run_inst.font.color.rgb = COLOR_SECONDARY
 
-    doc.add_page_break()
+    # -------------------------------------------------------------
+    # SECTION 2: PRELIMINARY PAGES (Lower Roman Page Numbering: i, ii, iii...)
+    # -------------------------------------------------------------
+    sec2 = doc.add_section(WD_SECTION.NEW_PAGE)
+    sec2.top_margin = Inches(1.0)
+    sec2.bottom_margin = Inches(1.0)
+    sec2.left_margin = Inches(1.0)
+    sec2.right_margin = Inches(1.0)
+    sec2.header.is_linked_to_previous = False
+    sec2.footer.is_linked_to_previous = False
+    sectPr2 = sec2._sectPr
+    sectPr2.append(parse_xml(f'<w:pgNumType {nsdecls("w")} w:fmt="lowerRoman" w:start="1"/>'))
+    add_page_number_to_footer(sec2.footer)
 
-    # -------------------------------------------------------------
-    # PRELIMINARY: ABSTRACT
-    # -------------------------------------------------------------
+    # ABSTRACT
     p_abs_title = doc.add_paragraph()
+    p_abs_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
     run_abs_title = p_abs_title.add_run("ABSTRACT")
     run_abs_title.font.name = 'Times New Roman'
     run_abs_title.font.size = Pt(16)
@@ -164,7 +219,7 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         p_abs = doc.add_paragraph()
         p_abs.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p_abs.paragraph_format.line_spacing = 1.5
-        p_abs.paragraph_format.space_after = Pt(8)
+        p_abs.paragraph_format.space_after = Pt(6)
         run_p = p_abs.add_run(para)
         run_p.font.name = 'Times New Roman'
         run_p.font.size = Pt(12)
@@ -181,11 +236,10 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     run_kw_val.font.italic = True
     run_kw_val.font.size = Pt(11)
 
-    # -------------------------------------------------------------
-    # PRELIMINARY: TABLE OF CONTENTS (Static Formatted)
-    # -------------------------------------------------------------
+    # TABLE OF CONTENTS (Automatic Word Field Code + Formatted Heading)
     doc.add_page_break()
     p_toc_title = doc.add_paragraph()
+    p_toc_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
     r_toc_t = p_toc_title.add_run("TABLE OF CONTENTS")
     r_toc_t.font.name = 'Times New Roman'
     r_toc_t.font.size = Pt(16)
@@ -193,76 +247,25 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     r_toc_t.font.color.rgb = COLOR_PRIMARY
     p_toc_title.paragraph_format.space_after = Pt(14)
 
-    toc_entries = [
-        ("ABSTRACT", "ii"),
-        ("LIST OF TABLES", "iv"),
-        ("LIST OF FIGURES", "v"),
-        ("CHAPTER 1: INTRODUCTION", "1"),
-        ("  1.1 Background of the Project", "1"),
-        ("  1.2 Problem Statement", "2"),
-        ("  1.3 Aim and Objectives", "3"),
-        ("  1.4 Scope of the Project", "4"),
-        ("  1.5 Motivation and Significance", "5"),
-        ("  1.6 Organisation of the Report", "6"),
-        ("CHAPTER 2: LITERATURE REVIEW", "7"),
-        ("  2.1 Introduction", "7"),
-        ("  2.2 Review of Existing Systems and Research", "7"),
-        ("  2.3 Comparison of Existing Approaches", "9"),
-        ("  2.4 Summary", "10"),
-        ("CHAPTER 3: SYSTEM DESIGN AND METHODOLOGY", "11"),
-        ("  3.1 Proposed Methodology", "11"),
-        ("    3.1.1 Overall System Architecture", "11"),
-        ("    3.1.2 User Roles and Workspace Management", "12"),
-        ("    3.1.3 Functional and Non-Functional Requirements", "13"),
-        ("    3.1.4 System Workflow and Data Flow Architecture", "14"),
-        ("    3.1.5 Entity Relationship (ER) Modelling", "15"),
-        ("    3.1.6 Relational Normalization Proof (1NF to 3NF)", "17"),
-        ("    3.1.7 Relational Schema, Constraints and Referential Integrity", "18"),
-        ("    3.1.8 Advanced Database Objects: Views, Procedures and Triggers", "19"),
-        ("    3.1.9 B-Tree Indexing Strategy & Query Optimization Design", "20"),
-        ("    3.1.10 ACID Transaction Management and Concurrency Control", "21"),
-        ("    3.1.11 Emission Calculation Methodology & Mathematical Formulas", "22"),
-        ("    3.1.12 AI Advisory Architecture and Offline Heuristic Fallback", "23"),
-        ("CHAPTER 4: IMPLEMENTATION", "25"),
-        ("  4.1 Algorithms and Core Code Snippets", "25"),
-        ("  4.2 Database and API Integration", "29"),
-        ("    4.2.1 Landing Page & Authentication Workflow", "31"),
-        ("    4.2.2 Executive Carbon Dashboard", "32"),
-        ("    4.2.3 Real-Time Activity Wizard with Live Preview", "33"),
-        ("    4.2.4 Emissions Analytics & CSV Report Export", "34"),
-        ("    4.2.5 Carbon Reduction Goals & AI Insights Advisory", "35"),
-        ("    4.2.6 Comprehensive ADBMS SQL Demonstrations", "36"),
-        ("    4.2.7 Comprehensive Testing & Verification Results", "38"),
-        ("  4.3 Implementation Challenges and Technical Solutions", "39"),
-        ("CHAPTER 5: CONCLUSION AND FUTURE SCOPE", "41"),
-        ("  5.1 Summary of the Work", "41"),
-        ("  5.2 Objectives Achieved", "41"),
-        ("  5.3 Limitations", "43"),
-        ("  5.4 Future Enhancements", "44"),
-        ("REFERENCES", "45")
-    ]
+    # Insert Native Automatic Word Table of Contents field code
+    p_toc_field = doc.add_paragraph()
+    p_toc_field.paragraph_format.line_spacing = 1.15
+    p_toc_field.paragraph_format.space_after = Pt(12)
+    r_toc_begin = p_toc_field.add_run()
+    r_toc_begin._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="begin"/>'))
+    r_toc_instr = p_toc_field.add_run()
+    r_toc_instr._r.append(parse_xml(f'<w:instrText {nsdecls("w")} xml:space="preserve"> TOC \\o "1-3" \\h \\z \\u </w:instrText>'))
+    r_toc_sep = p_toc_field.add_run()
+    r_toc_sep._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="separate"/>'))
+    r_toc_txt = p_toc_field.add_run("[Automatic Table of Contents: Right-click and choose 'Update Field' to refresh]")
+    r_toc_txt.font.name = 'Times New Roman'
+    r_toc_txt.font.italic = True
+    r_toc_txt.font.size = Pt(10.5)
+    r_toc_txt.font.color.rgb = COLOR_MUTED
+    r_toc_end = p_toc_field.add_run()
+    r_toc_end._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="end"/>'))
 
-    for title, pg in toc_entries:
-        p_row = doc.add_paragraph()
-        p_row.paragraph_format.line_spacing = 1.15
-        p_row.paragraph_format.space_after = Pt(3)
-        r_title = p_row.add_run(title)
-        r_title.font.name = 'Times New Roman'
-        r_title.font.size = Pt(11)
-        if title.startswith("CHAPTER") or title in ["ABSTRACT", "REFERENCES", "LIST OF TABLES", "LIST OF FIGURES"]:
-            r_title.font.bold = True
-            r_title.font.color.rgb = COLOR_SECONDARY
-
-        # Dot leader
-        p_row.add_run(" " + "." * (85 - len(title) * 2) + " ")
-        r_pg = p_row.add_run(pg)
-        r_pg.font.name = 'Times New Roman'
-        r_pg.font.size = Pt(11)
-        r_pg.font.bold = True
-
-    # -------------------------------------------------------------
-    # PRELIMINARY: LIST OF TABLES & LIST OF FIGURES
-    # -------------------------------------------------------------
+    # LIST OF TABLES & LIST OF FIGURES
     doc.add_page_break()
     p_lot = doc.add_paragraph()
     r_lot = p_lot.add_run("LIST OF TABLES")
@@ -285,7 +288,7 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         r1 = p_row.add_run(f"{num}: {cap}")
         r1.font.name = 'Times New Roman'
         r1.font.size = Pt(11)
-        p_row.add_run(" " + "." * (75 - len(num) - len(cap)) + " ")
+        p_row.add_run(" " + "." * max(5, 75 - len(num) - len(cap)) + " ")
         r2 = p_row.add_run(pg)
         r2.font.name = 'Times New Roman'
         r2.font.size = Pt(11)
@@ -319,15 +322,27 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         r1 = p_row.add_run(f"{num}: {cap}")
         r1.font.name = 'Times New Roman'
         r1.font.size = Pt(11)
-        p_row.add_run(" " + "." * (75 - len(num) - len(cap)) + " ")
+        p_row.add_run(" " + "." * max(5, 75 - len(num) - len(cap)) + " ")
         r2 = p_row.add_run(pg)
         r2.font.name = 'Times New Roman'
         r2.font.size = Pt(11)
         r2.font.bold = True
 
     # -------------------------------------------------------------
-    # HELPER TO RENDER A TABLE IN DOCX
+    # SECTION 3: MAIN BODY (Decimal Page Numbering: 1, 2, 3...)
     # -------------------------------------------------------------
+    sec3 = doc.add_section(WD_SECTION.NEW_PAGE)
+    sec3.top_margin = Inches(1.0)
+    sec3.bottom_margin = Inches(1.0)
+    sec3.left_margin = Inches(1.0)
+    sec3.right_margin = Inches(1.0)
+    sec3.header.is_linked_to_previous = False
+    sec3.footer.is_linked_to_previous = False
+    sectPr3 = sec3._sectPr
+    sectPr3.append(parse_xml(f'<w:pgNumType {nsdecls("w")} w:fmt="decimal" w:start="1"/>'))
+    add_page_number_to_footer(sec3.footer)
+
+    # TABLE RENDERER
     def render_table(table_data):
         headers = table_data['headers']
         rows = table_data['rows']
@@ -369,7 +384,7 @@ def create_docx_report(target_docx_path=DOCX_PATH):
                     run.font.size = Pt(9.5)
                     run.font.color.rgb = COLOR_CHARCOAL
 
-        # Add caption below table
+        # Caption
         p_cap = doc.add_paragraph()
         p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p_cap.paragraph_format.space_before = Pt(6)
@@ -380,7 +395,7 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         run_cap.font.bold = True
         run_cap.font.color.rgb = COLOR_MUTED
 
-    # HELPER TO RENDER A CODE BLOCK IN DOCX
+    # CODE BLOCK RENDERER
     def render_code_block(title, code):
         p_t = doc.add_paragraph()
         p_t.paragraph_format.space_before = Pt(10)
@@ -407,7 +422,7 @@ def create_docx_report(target_docx_path=DOCX_PATH):
         p_after = doc.add_paragraph()
         p_after.paragraph_format.space_after = Pt(8)
 
-    # HELPER TO INSERT FIGURE WITH CAPTION
+    # FIGURE RENDERER
     def render_figure(fig_info):
         path = os.path.join(DOCS_DIR, '..', fig_info['path'])
         if os.path.exists(path):
@@ -430,64 +445,31 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     # -------------------------------------------------------------
     # CHAPTER 1: INTRODUCTION
     # -------------------------------------------------------------
-    doc.add_page_break()
-    p_ch1 = doc.add_paragraph()
-    r_ch1 = p_ch1.add_run(CHAPTER_1_CONTENT['title'])
-    r_ch1.font.name = 'Times New Roman'
-    r_ch1.font.size = Pt(18)
-    r_ch1.font.bold = True
-    r_ch1.font.color.rgb = COLOR_PRIMARY
-    p_ch1.paragraph_format.space_after = Pt(16)
+    p_ch1 = doc.add_paragraph(style='Heading 1')
+    p_ch1.text = CHAPTER_1_CONTENT['title']
 
     for sec in CHAPTER_1_CONTENT['sections']:
-        p_sec = doc.add_paragraph()
-        p_sec.paragraph_format.space_before = Pt(12)
-        p_sec.paragraph_format.space_after = Pt(4)
-        r_sec = p_sec.add_run(sec['heading'])
-        r_sec.font.name = 'Times New Roman'
-        r_sec.font.size = Pt(14)
-        r_sec.font.bold = True
-        r_sec.font.color.rgb = COLOR_SECONDARY
+        p_sec = doc.add_paragraph(style='Heading 2')
+        p_sec.text = sec['heading']
 
         for para in sec['body'].split('\n\n'):
             p_body = doc.add_paragraph()
-            p_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            p_body.paragraph_format.line_spacing = 1.5
-            p_body.paragraph_format.space_after = Pt(6)
-            r_b = p_body.add_run(para)
-            r_b.font.name = 'Times New Roman'
-            r_b.font.size = Pt(12)
+            p_body.text = para
 
     # -------------------------------------------------------------
     # CHAPTER 2: LITERATURE REVIEW
     # -------------------------------------------------------------
     doc.add_page_break()
-    p_ch2 = doc.add_paragraph()
-    r_ch2 = p_ch2.add_run(CHAPTER_2_CONTENT['title'])
-    r_ch2.font.name = 'Times New Roman'
-    r_ch2.font.size = Pt(18)
-    r_ch2.font.bold = True
-    r_ch2.font.color.rgb = COLOR_PRIMARY
-    p_ch2.paragraph_format.space_after = Pt(16)
+    p_ch2 = doc.add_paragraph(style='Heading 1')
+    p_ch2.text = CHAPTER_2_CONTENT['title']
 
     for sec in CHAPTER_2_CONTENT['sections']:
-        p_sec = doc.add_paragraph()
-        p_sec.paragraph_format.space_before = Pt(12)
-        p_sec.paragraph_format.space_after = Pt(4)
-        r_sec = p_sec.add_run(sec['heading'])
-        r_sec.font.name = 'Times New Roman'
-        r_sec.font.size = Pt(14)
-        r_sec.font.bold = True
-        r_sec.font.color.rgb = COLOR_SECONDARY
+        p_sec = doc.add_paragraph(style='Heading 2')
+        p_sec.text = sec['heading']
 
         for para in sec['body'].split('\n\n'):
             p_body = doc.add_paragraph()
-            p_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            p_body.paragraph_format.line_spacing = 1.5
-            p_body.paragraph_format.space_after = Pt(6)
-            r_b = p_body.add_run(para)
-            r_b.font.name = 'Times New Roman'
-            r_b.font.size = Pt(12)
+            p_body.text = para
 
         if 'table' in sec:
             render_table(sec['table'])
@@ -496,52 +478,25 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     # CHAPTER 3: SYSTEM DESIGN AND METHODOLOGY
     # -------------------------------------------------------------
     doc.add_page_break()
-    p_ch3 = doc.add_paragraph()
-    r_ch3 = p_ch3.add_run(CHAPTER_3_CONTENT['title'])
-    r_ch3.font.name = 'Times New Roman'
-    r_ch3.font.size = Pt(18)
-    r_ch3.font.bold = True
-    r_ch3.font.color.rgb = COLOR_PRIMARY
-    p_ch3.paragraph_format.space_after = Pt(16)
+    p_ch3 = doc.add_paragraph(style='Heading 1')
+    p_ch3.text = CHAPTER_3_CONTENT['title']
 
     for sec in CHAPTER_3_CONTENT['sections']:
-        p_sec = doc.add_paragraph()
-        p_sec.paragraph_format.space_before = Pt(12)
-        p_sec.paragraph_format.space_after = Pt(4)
-        r_sec = p_sec.add_run(sec['heading'])
-        r_sec.font.name = 'Times New Roman'
-        r_sec.font.size = Pt(14)
-        r_sec.font.bold = True
-        r_sec.font.color.rgb = COLOR_SECONDARY
+        p_sec = doc.add_paragraph(style='Heading 2')
+        p_sec.text = sec['heading']
 
         for para in sec['body'].split('\n\n'):
             p_body = doc.add_paragraph()
-            p_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            p_body.paragraph_format.line_spacing = 1.5
-            p_body.paragraph_format.space_after = Pt(6)
-            r_b = p_body.add_run(para)
-            r_b.font.name = 'Times New Roman'
-            r_b.font.size = Pt(12)
+            p_body.text = para
 
         if 'subsections' in sec:
             for sub in sec['subsections']:
-                p_sub = doc.add_paragraph()
-                p_sub.paragraph_format.space_before = Pt(10)
-                p_sub.paragraph_format.space_after = Pt(4)
-                r_sub = p_sub.add_run(sub['subheading'])
-                r_sub.font.name = 'Times New Roman'
-                r_sub.font.size = Pt(13)
-                r_sub.font.bold = True
-                r_sub.font.color.rgb = COLOR_PRIMARY
+                p_sub = doc.add_paragraph(style='Heading 3')
+                p_sub.text = sub['subheading']
 
                 for p_text in sub['text'].split('\n\n'):
                     p_body = doc.add_paragraph()
-                    p_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-                    p_body.paragraph_format.line_spacing = 1.5
-                    p_body.paragraph_format.space_after = Pt(6)
-                    r_b = p_body.add_run(p_text)
-                    r_b.font.name = 'Times New Roman'
-                    r_b.font.size = Pt(12)
+                    p_body.text = p_text
 
                 if 'figure' in sub:
                     render_figure(sub['figure'])
@@ -550,32 +505,16 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     # CHAPTER 4: IMPLEMENTATION
     # -------------------------------------------------------------
     doc.add_page_break()
-    p_ch4 = doc.add_paragraph()
-    r_ch4 = p_ch4.add_run(CHAPTER_4_CONTENT['title'])
-    r_ch4.font.name = 'Times New Roman'
-    r_ch4.font.size = Pt(18)
-    r_ch4.font.bold = True
-    r_ch4.font.color.rgb = COLOR_PRIMARY
-    p_ch4.paragraph_format.space_after = Pt(16)
+    p_ch4 = doc.add_paragraph(style='Heading 1')
+    p_ch4.text = CHAPTER_4_CONTENT['title']
 
     for sec in CHAPTER_4_CONTENT['sections']:
-        p_sec = doc.add_paragraph()
-        p_sec.paragraph_format.space_before = Pt(12)
-        p_sec.paragraph_format.space_after = Pt(4)
-        r_sec = p_sec.add_run(sec['heading'])
-        r_sec.font.name = 'Times New Roman'
-        r_sec.font.size = Pt(14)
-        r_sec.font.bold = True
-        r_sec.font.color.rgb = COLOR_SECONDARY
+        p_sec = doc.add_paragraph(style='Heading 2')
+        p_sec.text = sec['heading']
 
         for para in sec['body'].split('\n\n'):
             p_body = doc.add_paragraph()
-            p_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            p_body.paragraph_format.line_spacing = 1.5
-            p_body.paragraph_format.space_after = Pt(6)
-            r_b = p_body.add_run(para)
-            r_b.font.name = 'Times New Roman'
-            r_b.font.size = Pt(12)
+            p_body.text = para
 
         if 'code_snippets' in sec:
             for snippet in sec['code_snippets']:
@@ -586,36 +525,19 @@ def create_docx_report(target_docx_path=DOCX_PATH):
 
         if 'ui_walkthrough' in sec:
             for item in sec['ui_walkthrough']:
-                p_item = doc.add_paragraph()
-                p_item.paragraph_format.space_before = Pt(8)
-                p_item.paragraph_format.space_after = Pt(4)
-                r_it = p_item.add_run(item['title'])
-                r_it.font.name = 'Times New Roman'
-                r_it.font.size = Pt(13)
-                r_it.font.bold = True
-                r_it.font.color.rgb = COLOR_PRIMARY
+                p_item = doc.add_paragraph(style='Heading 3')
+                p_item.text = item['title']
 
                 for p_text in item['text'].split('\n\n'):
                     p_body = doc.add_paragraph()
-                    p_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-                    p_body.paragraph_format.line_spacing = 1.5
-                    p_body.paragraph_format.space_after = Pt(6)
-                    r_b = p_body.add_run(p_text)
-                    r_b.font.name = 'Times New Roman'
-                    r_b.font.size = Pt(12)
+                    p_body.text = p_text
 
                 if 'figure' in item:
                     render_figure(item['figure'])
 
         if 'adbms_sql_demonstrations' in sec:
-            p_sql_hdr = doc.add_paragraph()
-            p_sql_hdr.paragraph_format.space_before = Pt(12)
-            p_sql_hdr.paragraph_format.space_after = Pt(6)
-            r_sql_hdr = p_sql_hdr.add_run("4.2.6 Comprehensive Advanced DBMS SQL Demonstrations")
-            r_sql_hdr.font.name = 'Times New Roman'
-            r_sql_hdr.font.size = Pt(13)
-            r_sql_hdr.font.bold = True
-            r_sql_hdr.font.color.rgb = COLOR_PRIMARY
+            p_sql_hdr = doc.add_paragraph(style='Heading 3')
+            p_sql_hdr.text = "4.2.6 Comprehensive Advanced DBMS SQL Demonstrations"
 
             for demo in sec['adbms_sql_demonstrations']:
                 render_code_block(demo['title'], demo['sql'])
@@ -627,47 +549,24 @@ def create_docx_report(target_docx_path=DOCX_PATH):
                 r_exp.font.size = Pt(11)
 
         if 'testing_summary' in sec:
-            p_test_hdr = doc.add_paragraph()
-            p_test_hdr.paragraph_format.space_before = Pt(12)
-            p_test_hdr.paragraph_format.space_after = Pt(6)
-            r_test_hdr = p_test_hdr.add_run("4.2.7 Comprehensive Testing & Verification Results")
-            r_test_hdr.font.name = 'Times New Roman'
-            r_test_hdr.font.size = Pt(13)
-            r_test_hdr.font.bold = True
-            r_test_hdr.font.color.rgb = COLOR_PRIMARY
-
+            p_test_hdr = doc.add_paragraph(style='Heading 3')
+            p_test_hdr.text = "4.2.7 Comprehensive Testing & Verification Results"
             render_table(sec['testing_summary'])
 
     # -------------------------------------------------------------
     # CHAPTER 5: CONCLUSION AND FUTURE SCOPE
     # -------------------------------------------------------------
     doc.add_page_break()
-    p_ch5 = doc.add_paragraph()
-    r_ch5 = p_ch5.add_run(CHAPTER_5_CONTENT['title'])
-    r_ch5.font.name = 'Times New Roman'
-    r_ch5.font.size = Pt(18)
-    r_ch5.font.bold = True
-    r_ch5.font.color.rgb = COLOR_PRIMARY
-    p_ch5.paragraph_format.space_after = Pt(16)
+    p_ch5 = doc.add_paragraph(style='Heading 1')
+    p_ch5.text = CHAPTER_5_CONTENT['title']
 
     for sec in CHAPTER_5_CONTENT['sections']:
-        p_sec = doc.add_paragraph()
-        p_sec.paragraph_format.space_before = Pt(12)
-        p_sec.paragraph_format.space_after = Pt(4)
-        r_sec = p_sec.add_run(sec['heading'])
-        r_sec.font.name = 'Times New Roman'
-        r_sec.font.size = Pt(14)
-        r_sec.font.bold = True
-        r_sec.font.color.rgb = COLOR_SECONDARY
+        p_sec = doc.add_paragraph(style='Heading 2')
+        p_sec.text = sec['heading']
 
         for para in sec['body'].split('\n\n'):
             p_body = doc.add_paragraph()
-            p_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            p_body.paragraph_format.line_spacing = 1.5
-            p_body.paragraph_format.space_after = Pt(6)
-            r_b = p_body.add_run(para)
-            r_b.font.name = 'Times New Roman'
-            r_b.font.size = Pt(12)
+            p_body.text = para
 
         if 'table' in sec:
             render_table(sec['table'])
@@ -676,13 +575,8 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     # REFERENCES (Harvard Style)
     # -------------------------------------------------------------
     doc.add_page_break()
-    p_ref = doc.add_paragraph()
-    r_ref = p_ref.add_run("REFERENCES")
-    r_ref.font.name = 'Times New Roman'
-    r_ref.font.size = Pt(18)
-    r_ref.font.bold = True
-    r_ref.font.color.rgb = COLOR_PRIMARY
-    p_ref.paragraph_format.space_after = Pt(16)
+    p_ref = doc.add_paragraph(style='Heading 1')
+    p_ref.text = "REFERENCES"
 
     for ref in REFERENCES_LIST:
         p_entry = doc.add_paragraph()
@@ -700,107 +594,5 @@ def create_docx_report(target_docx_path=DOCX_PATH):
     doc.save(target_docx_path)
     print(f"[OK] Successfully built DOCX report at: {target_docx_path}")
 
-def create_markdown_report():
-    print("Generating CarbonIQ Markdown mirror...")
-    lines = []
-    lines.append(f"# {STUDENT_DETAILS['project_title']}\n")
-    lines.append(f"**{STUDENT_DETAILS['project_type']}**  ")
-    lines.append(f"**{STUDENT_DETAILS['institution']}**  ")
-    lines.append(f"**Academic Year:** {STUDENT_DETAILS['academic_year']} | **Date:** {STUDENT_DETAILS['submission_date']}\n")
-    lines.append("### Project Authors:")
-    for s in STUDENT_DETAILS['students']:
-        lines.append(f"- **{s['name']}** (Roll Number: `{s['roll_number']}`)")
-    lines.append("\n---\n")
-
-    lines.append("## ABSTRACT\n")
-    lines.append(ABSTRACT_TEXT + "\n")
-    lines.append(f"**Keywords:** *{', '.join(KEYWORDS)}*\n")
-    lines.append("\n---\n")
-
-    # Helper to convert table to markdown
-    def md_table(t_data):
-        res = [f"### {t_data['number']}: {t_data['caption']}\n"]
-        res.append("| " + " | ".join(t_data['headers']) + " |")
-        res.append("| " + " | ".join(["---"] * len(t_data['headers'])) + " |")
-        for row in t_data['rows']:
-            res.append("| " + " | ".join(str(c).replace("\n", "<br/>") for c in row) + " |")
-        res.append("\n")
-        return "\n".join(res)
-
-    # Chapter 1
-    lines.append(f"## {CHAPTER_1_CONTENT['title']}\n")
-    for sec in CHAPTER_1_CONTENT['sections']:
-        lines.append(f"### {sec['heading']}\n")
-        lines.append(sec['body'] + "\n")
-
-    # Chapter 2
-    lines.append(f"## {CHAPTER_2_CONTENT['title']}\n")
-    for sec in CHAPTER_2_CONTENT['sections']:
-        lines.append(f"### {sec['heading']}\n")
-        lines.append(sec['body'] + "\n")
-        if 'table' in sec:
-            lines.append(md_table(sec['table']))
-
-    # Chapter 3
-    lines.append(f"## {CHAPTER_3_CONTENT['title']}\n")
-    for sec in CHAPTER_3_CONTENT['sections']:
-        lines.append(f"### {sec['heading']}\n")
-        lines.append(sec['body'] + "\n")
-        if 'subsections' in sec:
-            for sub in sec['subsections']:
-                lines.append(f"#### {sub['subheading']}\n")
-                lines.append(sub['text'] + "\n")
-                if 'figure' in sub:
-                    lines.append(f"![{sub['figure']['caption']}]({sub['figure']['path']})  ")
-                    lines.append(f"*{sub['figure']['number']}: {sub['figure']['caption']}*\n")
-
-    # Chapter 4
-    lines.append(f"## {CHAPTER_4_CONTENT['title']}\n")
-    for sec in CHAPTER_4_CONTENT['sections']:
-        lines.append(f"### {sec['heading']}\n")
-        lines.append(sec['body'] + "\n")
-        if 'code_snippets' in sec:
-            for code_item in sec['code_snippets']:
-                lines.append(f"**{code_item['title']}**\n")
-                lines.append("```javascript\n" + code_item['code'] + "\n```\n")
-        if 'table' in sec:
-            lines.append(md_table(sec['table']))
-        if 'ui_walkthrough' in sec:
-            for ui in sec['ui_walkthrough']:
-                lines.append(f"#### {ui['title']}\n")
-                lines.append(ui['text'] + "\n")
-                if 'figure' in ui:
-                    lines.append(f"![{ui['figure']['caption']}]({ui['figure']['path']})  ")
-                    lines.append(f"*{ui['figure']['number']}: {ui['figure']['caption']}*\n")
-        if 'adbms_sql_demonstrations' in sec:
-            lines.append("#### 4.2.6 Comprehensive Advanced DBMS SQL Demonstrations\n")
-            for demo in sec['adbms_sql_demonstrations']:
-                lines.append(f"**{demo['title']}**\n")
-                lines.append("```sql\n" + demo['sql'] + "\n```\n")
-                lines.append(f"*Technical Analysis: {demo['explanation']}*\n")
-        if 'testing_summary' in sec:
-            lines.append("#### 4.2.7 Comprehensive Testing & Verification Results\n")
-            lines.append(md_table(sec['testing_summary']))
-
-    # Chapter 5
-    lines.append(f"## {CHAPTER_5_CONTENT['title']}\n")
-    for sec in CHAPTER_5_CONTENT['sections']:
-        lines.append(f"### {sec['heading']}\n")
-        lines.append(sec['body'] + "\n")
-        if 'table' in sec:
-            lines.append(md_table(sec['table']))
-
-    # References
-    lines.append("## REFERENCES\n")
-    for ref in REFERENCES_LIST:
-        lines.append(f"- **{ref['citation']}** {ref['details']}")
-
-    with open(MD_PATH, 'w', encoding='utf-8') as f:
-        f.write("\n".join(lines))
-    print(f"[OK] Successfully built Markdown mirror at: {MD_PATH}")
-
 if __name__ == '__main__':
     create_docx_report()
-    create_markdown_report()
-    print("Report generation pipeline completed successfully!")
-

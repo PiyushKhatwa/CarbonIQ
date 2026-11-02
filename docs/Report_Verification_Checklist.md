@@ -39,7 +39,7 @@
 
 ### Area 2: Project Design
 - **Demonstrated Competency:** Full relational modeling featuring an Entity Relationship (ER) Diagram (Figure 3.3) comprising 13 tables in Third Normal Form (3NF).
-- **Advanced Database Architecture:** Domain check constraints (`chk_positive_quantity`, `chk_activity_workspace_scope`), referential integrity cascades (`ON DELETE CASCADE` / `SET NULL`), 31 B-tree indexes, 4 analytical reporting views (`v_monthly_emissions`, `v_category_emissions`), active triggers (`trg_audit_activities` logging JSONB to `audit_logs`), and stored procedures (`sp_record_activity_with_emissions`).
+- **Advanced Database Architecture:** Domain check constraints (`chk_positive_quantity`, `chk_activity_workspace_scope`), referential integrity cascades (`ON DELETE CASCADE` / `SET NULL`), 31 B-tree indexes, 4 analytical reporting views (`v_monthly_emissions`, `v_category_emissions`), active triggers (`trg_audit_activities` logging JSONB to `audit_logs`), and stored functions (`sp_record_activity_with_emissions`).
 
 ### Area 3: Project Implementation
 - **Demonstrated Competency:** Authentic, operational full-stack application connecting:
@@ -55,8 +55,8 @@
   - `npm run test:concurrency`: 10/10 simultaneous client transactions committed in 274 ms with zero deadlocks.
 
 ### Area 4: Project Report Quality
-- **Demonstrated Competency:** 46 pages of in-depth technical documentation in both editable Microsoft Word (`.docx`, 2.27 MB) and Markdown (`.md`, 74 KB) formats.
-- **DOCX Integrity & Word Validation:** Rebuilt through a strict validation pipeline and verified via Microsoft Word 16.0 COM automation (`Word.Application`). Word successfully opened the finalized document with **0 errors**, confirming that the file is completely valid, editable, and uncorrupted.
+- **Demonstrated Competency:** 46 pages of in-depth technical documentation in both editable Microsoft Word (`.docx`, 2.28 MB) and Markdown (`.md`, 74 KB) formats.
+- **DOCX Integrity & Word Validation:** Rebuilt through a strict validation pipeline with built-in Heading styles (`Heading 1`, `Heading 2`, `Heading 3`), native automatic Word Table of Contents field, multi-section page numbering (Roman `i, ii, iii...` for preliminary, Arabic `1, 2, 3...` for main body), and verified via Microsoft Word 16.0 COM automation (`Word.Application`). Word successfully opened and updated the finalized document with **0 errors**, confirming that the file is completely valid, editable, and uncorrupted.
 - **Figure & Diagram Quality:** 10 high-resolution (300 DPI) figures created specifically for the project, illustrating system architecture, data flows, ER modeling, transaction workflows, AI heuristics, and UI walkthroughs.
 - **Referencing Discipline:** 100% genuine citations following the Harvard Referencing Style with bidirectional citation matching.
 

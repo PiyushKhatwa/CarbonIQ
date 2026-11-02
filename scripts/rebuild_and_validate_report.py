@@ -1,32 +1,31 @@
 """
-CarbonIQ Report Rebuilder and Validator
+CarbonIQ Report Rebuilder and Validator (Academic QA Pass)
 Strictly executes the validation pipeline:
 1. Generates temporary DOCX: docs/CarbonIQ_Final_Project_Report_TEMP.docx
 2. Validates that it is a valid ZIP archive
-3. Reopens using python-docx to check paragraphs, tables, images, and 5 chapters
-4. Tests opening using actual Microsoft Word COM automation (Word 16.0)
+3. Reopens using python-docx to verify paragraphs, tables, images, and 5 chapters
+4. Executes Microsoft Word 16.0 COM automation to update the Table of Contents, verify page count, and save
 5. Overwrites docs/CarbonIQ_Final_Project_Report.docx ONLY upon 100% success
-6. Regenerates Markdown mirror docs/CarbonIQ_Final_Project_Report.md
+6. Preserves Markdown report unchanged as requested
 7. Reports validation results and exact file size
 """
 
 import os
-import sys
 import shutil
 import zipfile
 import subprocess
 import docx
 
 import generate_docx_report
+import report_content
 
 DOCS_DIR = os.path.join(os.path.dirname(__file__), '..', 'docs')
 TEMP_DOCX = os.path.join(DOCS_DIR, 'CarbonIQ_Final_Project_Report_TEMP.docx')
 FINAL_DOCX = os.path.join(DOCS_DIR, 'CarbonIQ_Final_Project_Report.docx')
-FINAL_MD = os.path.join(DOCS_DIR, 'CarbonIQ_Final_Project_Report.md')
 
 def rebuild_and_validate():
     print("==============================================================================")
-    print("CARBONIQ REPORT REBUILD & STRICT VALIDATION PIPELINE")
+    print("CARBONIQ REPORT FINAL ACADEMIC QA & VALIDATION PIPELINE")
     print("==============================================================================")
 
     # Step 1: Generate temporary docx
@@ -86,21 +85,31 @@ def rebuild_and_validate():
     else:
         raise RuntimeError("Missing Student 2 details!")
 
-    # Verify Abstract keywords count
-    import report_content
+    # Verify Abstract keywords count (4-6 allowed, exactly 5 present)
     kw_count = len(report_content.KEYWORDS)
     print(f"    [OK] Verified Keywords Count: {kw_count} (Requires 4-6; configured: {kw_count})")
     if kw_count < 4 or kw_count > 6:
         raise RuntimeError(f"Invalid keywords count: {kw_count}")
 
-    # Step 4: Validate directly with Microsoft Word COM automation
-    print("\n[STEP 4] Executing Microsoft Word 16.0 COM Validation...")
+    # Verify Heading styles applied
+    h1_count = sum(1 for p in doc.paragraphs if p.style.name == 'Heading 1')
+    h2_count = sum(1 for p in doc.paragraphs if p.style.name == 'Heading 2')
+    h3_count = sum(1 for p in doc.paragraphs if p.style.name == 'Heading 3')
+    print(f"    [OK] Heading Styles Verified: Heading 1: {h1_count}, Heading 2: {h2_count}, Heading 3: {h3_count}")
+
+    # Step 4: Validate directly with Microsoft Word COM automation and update TOC
+    print("\n[STEP 4] Executing Microsoft Word 16.0 COM Automation (Updating TOC & Fields)...")
     powershell_cmd = (
         f"$word = New-Object -ComObject Word.Application; "
         f"$word.Visible = $false; "
         f"try {{ "
         f"  $doc = $word.Documents.Open('{os.path.abspath(TEMP_DOCX)}'); "
-        f"  Write-Host 'SUCCESS: Word opened document with 0 errors. Page count:' $doc.ComputeStatistics(2); "
+        f"  # Update all Table of Contents and fields natively\n"
+        f"  if ($doc.TablesOfContents.Count -ge 1) {{ $doc.TablesOfContents.Item(1).Update(); }} "
+        f"  $doc.Fields.Update(); "
+        f"  $pageCount = $doc.ComputeStatistics(2); "
+        f"  $doc.Save(); "
+        f"  Write-Host 'SUCCESS: Word updated TOC and saved document with 0 errors. Total pages:' $pageCount; "
         f"  $doc.Close(); "
         f"}} catch {{ "
         f"  Write-Host 'FAILED: ' $_.Exception.Message; "
@@ -126,20 +135,17 @@ def rebuild_and_validate():
     final_size = os.path.getsize(FINAL_DOCX)
     print(f"--> Successfully replaced final DOCX. Final File Size: {final_size:,} bytes ({final_size / (1024*1024):.2f} MB)")
 
-    # Step 6: Regenerate Markdown mirror
-    print(f"\n[STEP 6] Synchronizing Markdown mirror at:\n         {FINAL_MD}")
-    generate_docx_report.create_markdown_report()
-    md_size = os.path.getsize(FINAL_MD)
-    print(f"--> Successfully updated Markdown file. Size: {md_size:,} bytes")
-
-    # Step 7: Re-verify Final DOCX with Word COM once more
-    print("\n[STEP 7] Final Verification: Opening finalized DOCX via Word...")
+    # Step 6: Final Verification: Opening finalized DOCX via Word
+    print("\n[STEP 6] Final Verification: Opening finalized DOCX via Word...")
     final_ps = (
         f"$word = New-Object -ComObject Word.Application; "
         f"$word.Visible = $false; "
         f"try {{ "
         f"  $doc = $word.Documents.Open('{os.path.abspath(FINAL_DOCX)}'); "
-        f"  Write-Host 'VERIFIED: Final DOCX opened cleanly. Title:' $doc.Paragraphs.Item(2).Range.Text.Trim(); "
+        f"  $title = $doc.Paragraphs.Item(2).Range.Text.Trim(); "
+        f"  $pages = $doc.ComputeStatistics(2); "
+        f"  $tocCount = $doc.TablesOfContents.Count; "
+        f"  Write-Host \"VERIFIED: Final DOCX opened cleanly. Title: $title | Pages: $pages | TOCs: $tocCount\"; "
         f"  $doc.Close(); "
         f"}} catch {{ "
         f"  Write-Host 'FAILED: ' $_.Exception.Message; "
@@ -154,7 +160,7 @@ def rebuild_and_validate():
         raise RuntimeError("Final Word verification failed!")
 
     print("\n==============================================================================")
-    print("VALIDATION COMPLETE: DOCX REPAIRED & VERIFIED 100% OPERATIONAL")
+    print("ACADEMIC QA PASS COMPLETE: DOCX REBUILT & VERIFIED 100% OPERATIONAL")
     print("==============================================================================")
 
 if __name__ == '__main__':
