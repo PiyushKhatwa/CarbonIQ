@@ -38,7 +38,42 @@
 
 ---
 
-## 3. Advanced Database Features for ADBMS Demonstration
+## 3. Backend REST Architecture & API Implementation (Phase 3 Verified)
+
+### Layered Separation of Concerns
+- **Routes (`modules/*/*.routes.js`):** Request mapping, authentication requirement, workspace resolution, and schema validation.
+- **Middleware:**
+  - `requireAuth`: JWT validation against secret, user verification from `users` table.
+  - `resolveWorkspaceScope`: Multi-tenancy guard verifying whether caller is authorized for the active personal or organization workspace. Rejects cross-tenant access with 403.
+  - `validate`: Zod validation on `body`, `query`, and `params`.
+  - `errorHandler`: PostgreSQL error code translation (23505 duplicate, 23503 foreign key, 23514 check constraint) to clean client JSON.
+- **Controllers (`modules/*/*.controller.js`):** HTTP request extraction and standardized response delivery (`sendSuccess`, `sendCreated`, `sendPaginated`, `sendError`).
+- **Services (`modules/*/*.service.js`):** Business logic, deterministic arithmetic (`calculateEmissions`), and permission assertions.
+- **Repositories (`modules/*/*.repository.js`):** Parameterized SQL queries and ACID transaction management (`db.withTransaction`).
+
+### Verified API Test Results
+Executed via `npm run test:api` (`tests/backend_api_test.js`):
+- **25 / 25 automated tests passed (100% success rate)**
+- Validated:
+  1. Health check (`/health`)
+  2. Taxonomy queries (categories, types, factors)
+  3. Authentication (registration, duplicate email rejection 409, login success, invalid password rejection 401, `/auth/me`)
+  4. Workspaces discovery (`/workspaces`)
+  5. Organization & department creation
+  6. Multi-tenant workspace scoping (unauthorized org query rejected with 403 `WORKSPACE_ACCESS_DENIED`)
+  7. Deterministic live calculation preview (`/emissions/preview`)
+  8. Atomic activity + emission record insertion with frozen snapshot
+  9. Database check constraint rejection (negative quantity rejected with 400)
+  10. Activity history pagination and detail retrieval
+  11. Atomic update and recalculation
+  12. Analytical summary KPIs, monthly trends, and category breakdown
+  13. Goals creation and progress tracking against actual footprints
+  14. Recommendation listing, refresh, and status lifecycle
+  15. Cascaded deletion of activity and emission record
+
+---
+
+## 4. Advanced Database Features for ADBMS Demonstration
 
 1. **ACID Transaction Guarantee & Rollback:**
    An atomic multi-table transaction inserts an `activity` and its corresponding `emission_record`. If calculation fails or an invalid foreign key / constraint violation occurs mid-transaction, an automatic `ROLLBACK` prevents orphan activity rows.

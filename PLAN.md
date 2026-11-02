@@ -13,8 +13,8 @@
 | **Phase 0** | Repository Initialization, Architecture & Plan Approval | **COMPLETED** | 2026-11-02 |
 | **Phase 1** | ER Diagram, Data Dictionary & Normalized Database Schema | **COMPLETED** | 2026-11-02 |
 | **Phase 2** | PostgreSQL Migrations, Seeds & Advanced ADBMS Features | **COMPLETED** | 2026-11-02 |
-| **Phase 3** | Express Backend, Auth, Workspace Guard & Deterministic Engine | **READY TO START** | - |
-| **Phase 4** | Python FastAPI AI Service & Local Rule-Based Fallback Engine | **PENDING** | - |
+| **Phase 3** | Express Backend, Auth, Workspace Guard & Deterministic Engine | **COMPLETED** | 2026-11-02 |
+| **Phase 4** | Python FastAPI AI Service & Local Rule-Based Fallback Engine | **READY TO START** | - |
 | **Phase 5** | React 18 + Tailwind SaaS Frontend & Activity Wizard | **PENDING** | - |
 | **Phase 6** | E2E Integration, ADBMS Verification Suite & Academic Polish | **PENDING** | - |
 
@@ -46,14 +46,21 @@
 - [x] Document database inspection and management procedures in `database/README.md`.
 
 ### Phase 3: Backend REST APIs, Auth & Scoping
-- [ ] Initialize Express backend with modular architecture (`modules/auth`, `modules/activities`, `modules/emissions`, etc.).
-- [ ] Configure PostgreSQL connection pool (`pg` / `pg-promise`) with health checks.
-- [ ] Implement JWT authentication, bcrypt password hashing, and role checks.
-- [ ] Implement strict workspace context middleware (`x-workspace-type`, `x-organization-id`).
-- [ ] Implement atomic activity submission with decimal-safe CO2e calculation and factor snapshotting.
-- [ ] Implement analytics aggregation endpoints leveraging database views.
-- [ ] Implement goals and CSV reporting endpoints.
-- [ ] Backend automated test suite (Jest/Supertest).
+- [x] Set up modular Node.js + Express backend (`backend/src/`).
+- [x] Configure PostgreSQL connection pool (`pg.Pool`) with transaction support (`withTransaction`).
+- [x] Implement bcrypt password hashing (salt rounds 12) & JWT authentication.
+- [x] Implement strict workspace scoping middleware (`resolveWorkspaceScope`, personal vs. org isolation).
+- [x] Implement Auth module (`register`, `login`, `getMe`, `updateMe`).
+- [x] Implement Workspaces module (`getAvailableWorkspaces`).
+- [x] Implement Organizations module (CRUD, membership roles, department management).
+- [x] Implement Taxonomy module (categories, activity types, versioned emission factors).
+- [x] Implement Activities module with atomic transaction persistence & deterministic calculations.
+- [x] Implement Emissions analytics module (KPI summaries, monthly trends, category & department breakdowns).
+- [x] Implement Goals module with dynamic progress tracking against recorded activity footprints.
+- [x] Implement Recommendations module with rule-based generation and status lifecycle.
+- [x] Implement centralized error handler & Zod input validation schemas.
+- [x] Author & execute automated test suite (`tests/backend_api_test.js`) with 25/25 tests passing.
+- [x] Document API reference guide (`docs/api/backend_api_reference.md`).
 
 ### Phase 4: AI Service & Local Rule-Based Engine
 - [ ] Initialize FastAPI Python service (`ai-service/`).

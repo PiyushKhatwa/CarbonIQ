@@ -13,6 +13,7 @@
     "db:verify": "node database/scripts/verify.js",
     "dev:backend": "npm --workspace=backend run dev",
     "dev:frontend": "npm --workspace=frontend run dev",
+    "test:api": "node tests/backend_api_test.js",
     "test:db": "node database/scripts/verify.js"
   },
   "devDependencies": {
