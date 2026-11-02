@@ -15,8 +15,8 @@
 | **Phase 2** | PostgreSQL Migrations, Seeds & Advanced ADBMS Features | **COMPLETED** | 2026-11-02 |
 | **Phase 3** | Express Backend, Auth, Workspace Guard & Deterministic Engine | **COMPLETED** | 2026-11-02 |
 | **Phase 4** | React 18 + Tailwind SaaS Frontend & Activity Wizard | **COMPLETED** | 2026-11-02 |
-| **Phase 5** | Python FastAPI AI Service & Local Rule-Based Fallback Engine | **READY TO START** | - |
-| **Phase 6** | E2E Integration, ADBMS Verification Suite & Academic Polish | **PENDING** | - |
+| **Phase 5** | Python FastAPI AI Service & Local Rule-Based Fallback Engine | **COMPLETED** | 2026-11-02 |
+| **Phase 6** | E2E Integration, ADBMS Verification Suite & Academic Polish | **COMPLETED** | 2026-11-02 |
 
 ---
 
@@ -62,7 +62,7 @@
 - [x] Author & execute automated test suite (`tests/backend_api_test.js`) with 25/25 tests passing.
 - [x] Document API reference guide (`docs/api/backend_api_reference.md`).
 
-### Phase 4: Modern Sustainability SaaS Frontend (Completed)
+### Phase 4: Modern Sustainability SaaS Frontend
 - [x] Configure Vite 5, TailwindCSS with forest-green & emerald palette, and PostCSS.
 - [x] Centralized API client service (`frontend/src/services/api.js`) attaching JWT and workspace headers.
 - [x] Auth & Workspace React context providers (`AuthContext.jsx`, `WorkspaceContext.jsx`).
@@ -78,29 +78,18 @@
 - [x] User Settings & System Health (`SettingsPage.jsx`).
 - [x] Verified full production bundle build (`vite build` completed in 17.84s).
 
-### Phase 4: AI Service & Local Rule-Based Engine
-- [ ] Initialize FastAPI Python service (`ai-service/`).
-- [ ] Define Pydantic request/response schemas for insight generation.
-- [ ] Implement external AI client (Gemini / OpenAI API) with timeout and sanitization.
-- [ ] Implement offline deterministic rule-based recommendation engine fallback.
-- [ ] Test AI fallback under simulated network/API failure.
-
-### Phase 5: Modern SaaS UI / UX
-- [ ] Initialize Vite + React 18 + TailwindCSS frontend.
-- [ ] Establish sustainability design system (Forest green `#176B4D`, emerald, clean typography).
-- [ ] Implement persistent layout with sidebar, topbar workspace switcher, and user menu.
-- [ ] Build Onboarding & Workspace selector (Personal vs Organization).
-- [ ] Build Overview Dashboard (Metric cards, Recharts trends, category breakdowns, goal progress).
-- [ ] Build intuitive "Add Activity" modal/page with dynamic inputs and real-time calculation preview.
-- [ ] Build Activity History table with pagination, filtering, and delete/edit.
-- [ ] Build Emissions Analytics and Goal tracking interfaces.
-- [ ] Build AI Insights screen with actionable recommendation cards and feedback actions.
-- [ ] Implement loading skeletons, empty states, and error handling.
+### Phase 5: AI Service & Local Rule-Based Engine
+- [x] Initialize FastAPI Python microservice (`ai-service/app/main.py`).
+- [x] Define Pydantic request/response schemas for insight generation.
+- [x] Implement external AI client (Gemini Interactions API) with timeout and sanitization.
+- [x] Implement offline deterministic rule-based recommendation engine fallback covering all 5 categories.
+- [x] Tested AI service with automated tests (`tests/ai_service_test.py`) - 4/4 passed.
+- [x] Integrated backend recommendations proxy service to communicate with FastAPI microservice on port 8000 and persist recommendations to PostgreSQL.
 
 ### Phase 6: E2E Verification & ADBMS Academic Demonstrations
-- [ ] Run full cross-stack integration verification.
-- [ ] Run and document ACID transaction rollback test.
-- [ ] Run and document concurrency multi-submission test.
-- [ ] Capture query plans with `EXPLAIN (ANALYZE, BUFFERS)` for index optimization report.
-- [ ] Final polish, zero console errors, zero dead buttons.
+- [x] Run full cross-stack integration verification.
+- [x] Run and document ACID transaction rollback test (`npm run test:adbms`).
+- [x] Run and document concurrency multi-submission test (`npm run test:concurrency` - 10 simultaneous transactions).
+- [x] Capture query plans with `EXPLAIN (ANALYZE, BUFFERS)` for index optimization report.
+- [x] Verified zero runtime errors and fully functional local-first architecture.
 

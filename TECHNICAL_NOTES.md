@@ -96,29 +96,88 @@ Executed via `npm run test:api` (`tests/backend_api_test.js`):
 
 ---
 
-## 5. Advanced Database Features for ADBMS Demonstration
+## 5. AI Recommendation Microservice (Phase 5 Verified)
 
-1. **ACID Transaction Guarantee & Rollback:**
-   An atomic multi-table transaction inserts an `activity` and its corresponding `emission_record`. If calculation fails or an invalid foreign key / constraint violation occurs mid-transaction, an automatic `ROLLBACK` prevents orphan activity rows.
-2. **PostgreSQL Trigger (`fn_audit_log_trigger`):**
-   Fires automatically `AFTER INSERT OR UPDATE OR DELETE` on `activities` and `emission_factors` to record timestamp, action, and JSONB state into `audit_logs`.
-3. **Stored Procedure / Function (`fn_record_activity_with_emissions`):**
-   Demonstrates in-database procedural logic for factor lookup, arithmetic verification, and atomic persistence.
-4. **Analytical SQL Views:**
-   - `v_monthly_emissions`: Monthly aggregation partitioned by workspace.
-   - `v_category_breakdown`: Category-wise sum and percentage share.
-   - `v_department_emissions`: Department-level aggregates for organizations.
-5. **Query Plan Benchmarking (`EXPLAIN ANALYZE`):**
-   Comparison of sequential scans vs index scans using compound indexes on `(user_id, activity_date DESC)` and `(organization_id, department_id, activity_date DESC)`.
+### Architecture & Privacy
+- **Microservice Framework:** FastAPI on Python 3.14 (`ai-service/app/main.py`), running on `http://localhost:8000`.
+- **Validation:** Pydantic models for incoming payload (`InsightRequest`, `CategoryEmissionInput`, `PeriodComparisonInput`) and structured output (`InsightResponse`, `RecommendationItem`).
+- **Privacy Assurance:** Zero user PII, email addresses, or unanonymized freeform activity descriptions are transmitted to the AI engine. Only aggregated numeric metrics (`category`, `total_emissions_kg`, `percentage`, `activity_count`) and temporal percentage changes are analyzed.
+- **Resilient Fallback Engine:** If Google Gemini API is unavailable or `GEMINI_API_KEY` is not supplied, the microservice invokes an offline deterministic recommendation heuristic:
+  - Dynamically targets the caller's highest-emission category.
+  - Generates quantified, actionable recommendations across all 5 operational categories (`electricity`, `transportation`, `fuel`, `lpg`, `waste`).
+  - Assigns priority (`high`, `medium`, `low`) and estimated impact percentage.
+- **Automated AI Tests:** Executed via `npm run test:ai` (`tests/ai_service_test.py`):
+  - 4 / 4 tests passed (Health check, valid insights generation, 422 schema validation rejection, priority ranking verification).
 
 ---
 
-## 4. Local Setup & Environment Variables
+## 6. Advanced Database Features & Verification Results (Phase 6 ADBMS Demonstrations)
 
-- `.env.example` provides the baseline for `backend/`, `frontend/`, and `ai-service/`.
-- Local services:
-  - Frontend: `http://localhost:5173`
-  - Backend: `http://localhost:5000`
-  - AI Service: `http://localhost:8000`
-  - PostgreSQL: `localhost:5432` (`carboniq_db`)
+### Automated Test Suites
+1. **`npm run test:db` (`database/scripts/verify.js`):** 7 / 7 checks passed.
+2. **`npm run test:api` (`tests/backend_api_test.js`):** 25 / 25 checks passed.
+3. **`npm run test:ai` (`tests/ai_service_test.py`):** 4 / 4 checks passed.
+4. **`npm run test:adbms` (`database/scripts/run_adbms_suite.js`):** 8 / 8 checks passed.
+5. **`npm run test:concurrency` (`tests/concurrency_test.js`):** 10 / 10 concurrent transactions committed.
+
+### ADBMS Academic Criteria Evaluation
+
+1. **Relational Normalization (1NF–3NF):**
+   - Tables decomposed into single-theme entities (`users`, `organizations`, `organization_members`, `departments`, `activity_categories`, `activity_types`, `emission_factors`, `emission_factor_sources`, `activities`, `emission_records`, `goals`, `recommendations`, `audit_logs`).
+   - Every column contains atomic values, records have UUID primary keys, and non-key attributes depend strictly and entirely on the primary key without transitive dependencies.
+
+2. **ACID Transaction Guarantees & Rollback:**
+   - Activities and emission calculations are written inside an explicit atomic transaction (`BEGIN` ... `COMMIT`).
+   - Verified via `npm run test:adbms` (Test 4): Inducing an error midway cleanly rolls back the transaction, leaving exactly **0** orphan rows in `activities`.
+
+3. **High-Concurrency Stress Testing:**
+   - Verified via `npm run test:concurrency`: 10 simultaneous database connections recording activities and calculation snapshots concurrently completed in **274ms** with **0 deadlocks** and zero lost updates.
+
+4. **Active Database Triggers & Audit Trail:**
+   - Trigger `trg_audit_activities` intercepts `INSERT`, `UPDATE`, and `DELETE` operations on `activities` and populates `audit_logs` with before-and-after JSONB state snapshots.
+   - Verified in Test 5 of the ADBMS test suite.
+
+5. **Deterministic In-Database Stored Procedure:**
+   - Routine `sp_record_activity_with_emissions` performs atomic factor lookup, multiplication (`quantity * factor`), and persistence.
+   - Tested in Test 6: 100 kWh @ 0.7160 kg/kWh produced exactly `71.6000 kg CO2e`.
+
+6. **Analytical SQL Views:**
+   - `v_monthly_emissions`, `v_category_emissions`, and `v_department_emissions` provide clean reporting layers for dashboards without requiring multiple heavy ad-hoc queries.
+
+7. **Index Optimization & Query Plan Inspection (`EXPLAIN ANALYZE`):**
+   ```
+   Sort  (cost=21.05..21.06 rows=1 width=56) (actual time=0.514..0.516 rows=3.00 loops=1)
+     Sort Key: a.activity_date DESC
+     Sort Method: quicksort  Memory: 25kB
+     Buffers: shared hit=6
+     ->  Hash Join  (cost=9.53..21.04 rows=1 width=56) (actual time=0.090..0.100 rows=3.00 loops=1)
+           Hash Cond: (er.activity_id = a.id)
+           Buffers: shared hit=3
+           ->  Seq Scan on emission_records er  (cost=0.00..11.20 rows=120 width=34) (actual time=0.032..0.034 rows=5.00 loops=1)
+                 Buffers: shared hit=1
+           ->  Hash  (cost=9.50..9.50 rows=2 width=38) (actual time=0.046..0.047 rows=3.00 loops=1)
+                 Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                 Buffers: shared hit=2
+                 ->  Bitmap Heap Scan on activities a  (cost=4.16..9.50 rows=2 width=38) (actual time=0.033..0.035 rows=3.00 loops=1)
+                       Recheck Cond: (user_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid)
+                       Heap Blocks: exact=1
+                       Buffers: shared hit=2
+                       ->  Bitmap Index Scan on idx_activities_user_date  (cost=0.00..4.16 rows=2 width=0) (actual time=0.012..0.012 rows=11.00 loops=1)
+                             Index Cond: (user_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid)
+                             Index Searches: 1
+                             Buffers: shared hit=1
+   Planning Time: 0.446 ms
+   Execution Time: 0.580 ms
+   ```
+   - Proves index `idx_activities_user_date` (`user_id, activity_date DESC`) is actively used by PostgreSQL's query optimizer, resulting in execution in under **0.6 ms** with 100% cache hits.
+
+---
+
+## 7. Local Setup & Production Startup Guide
+
+- Backend: `npm run dev:backend` (port 5000)
+- Frontend: `npm run dev:frontend` (port 5173)
+- AI Service: `npm run dev:ai` (port 8000)
+- PostgreSQL: `localhost:5432` (`carboniq_db`)
+
 
