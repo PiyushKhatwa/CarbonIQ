@@ -1,7 +1,40 @@
+const dns = require('dns');
+const { Resolver } = require('dns').promises;
 const { Pool } = require('pg');
 const env = require('./env');
 
-const pool = new Pool(env.db);
+// DNS fallback for cloud databases (e.g., Neon on local networks with restricted DNS)
+if (env.databaseUrl && env.databaseUrl.includes('neon.tech')) {
+  const resolver = new Resolver();
+  resolver.setServers(['8.8.8.8', '1.1.1.1']);
+  const origLookup = dns.lookup;
+  dns.lookup = function(hostname, options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    resolver.resolve4(hostname)
+      .then(addresses => {
+        if (options && options.all) {
+          callback(null, addresses.map(a => ({ address: a, family: 4 })));
+        } else {
+          callback(null, addresses[0], 4);
+        }
+      })
+      .catch(() => origLookup(hostname, options, callback));
+  };
+}
+
+const poolConfig = env.databaseUrl
+  ? {
+      connectionString: env.databaseUrl,
+      max: env.db.max,
+      idleTimeoutMillis: env.db.idleTimeoutMillis,
+      ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false },
+    }
+  : env.db;
+
+const pool = new Pool(poolConfig);
 
 pool.on('error', (err) => {
   console.error('[PostgreSQL Pool Error]: Unexpected idle client error', err.message);
@@ -53,4 +86,3 @@ module.exports = {
   withTransaction,
   checkConnection,
 };
-

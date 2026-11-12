@@ -50,10 +50,10 @@ async function refreshRecommendations(workspace) {
   let insightData = null;
   const aiServiceUrl = `${env.aiService.url}/api/v1/insights/generate`;
 
-  // 4. Attempt calling Python FastAPI AI microservice
+  // 4. Attempt calling Python FastAPI AI microservice (15s timeout for cloud cold starts)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     const response = await fetch(aiServiceUrl, {
       method: 'POST',

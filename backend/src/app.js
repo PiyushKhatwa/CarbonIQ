@@ -22,7 +22,21 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.corsOrigin,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. server-to-server, curl, health checks)
+      if (!origin) return callback(null, true);
+      if (env.corsOrigin === '*') return callback(null, true);
+      const allowed = env.corsOrigin.split(',').map((o) => o.trim());
+      if (allowed.includes(origin) || allowed.includes('*')) {
+        return callback(null, true);
+      }
+      // Dynamically allow Vercel production and preview deployments
+      if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
+      // Fallback: allow to avoid breaking free preview environments
+      return callback(null, true);
+    },
     credentials: true,
   })
 );

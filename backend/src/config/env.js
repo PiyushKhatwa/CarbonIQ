@@ -12,6 +12,7 @@ module.exports = {
     secret: process.env.JWT_SECRET || 'super_secret_jwt_signing_key_carboniq_minimum_32_characters',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
+  databaseUrl: process.env.DATABASE_URL,
   db: {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
