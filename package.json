@@ -8,6 +8,8 @@
     "backend"
   ],
   "scripts": {
+    "start": "node backend/src/server.js",
+    "build": "npm --workspace=frontend run build",
     "db:migrate": "node database/scripts/migrate.js",
     "db:seed": "node database/scripts/seed.js",
     "db:verify": "node database/scripts/verify.js",

@@ -2,7 +2,26 @@
  * CarbonIQ Centralized Frontend API Service Client
  */
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api/v1').replace(/\/$/, '');
+// Dynamically resolve and normalize API Base URL:
+// 1. If VITE_API_BASE_URL is set (e.g., 'https://carboniq-backend.onrender.com' or with '/api/v1'):
+//    - Strips trailing slashes
+//    - Automatically guarantees that '/api/v1' is the endpoint prefix
+// 2. If VITE_API_BASE_URL is omitted or empty, defaults to '/api/v1' (for Vite local development proxy)
+function resolveApiBaseUrl() {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+  if (!envUrl) {
+    return '/api/v1';
+  }
+  if (envUrl.endsWith('/api/v1')) {
+    return envUrl;
+  }
+  if (envUrl.endsWith('/api')) {
+    return `${envUrl}/v1`;
+  }
+  return `${envUrl}/api/v1`;
+}
+
+const API_BASE = resolveApiBaseUrl();
 
 class ApiService {
   constructor() {
@@ -29,7 +48,9 @@ class ApiService {
   }
 
   async request(endpoint, options = {}) {
-    const url = `${API_BASE}${endpoint}`;
+    // Normalize endpoint to ensure leading slash
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${API_BASE}${cleanEndpoint}`;
     const headers = {
       'Content-Type': 'application/json',
       ...(options.headers || {}),
@@ -59,10 +80,18 @@ class ApiService {
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      const error = new Error(data?.error?.message || `API Error: ${response.status}`);
+      const errorMessage =
+        data?.error?.message ||
+        data?.message ||
+        (typeof data?.detail === 'string' ? data.detail : null) ||
+        (Array.isArray(data?.detail)
+          ? data.detail.map((d) => d.msg || JSON.stringify(d)).join(', ')
+          : null) ||
+        `API Error: ${response.status} (${response.statusText || 'Request Failed'})`;
+      const error = new Error(errorMessage);
       error.status = response.status;
-      error.code = data?.error?.code || 'API_ERROR';
-      error.details = data?.error?.details || null;
+      error.code = data?.error?.code || data?.code || 'API_ERROR';
+      error.details = data?.error?.details || data?.detail || null;
       throw error;
     }
 

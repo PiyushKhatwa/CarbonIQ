@@ -8,12 +8,12 @@ async function startServer() {
     const dbInfo = await db.checkConnection();
     console.log(`[PostgreSQL Connected] Database: ${dbInfo.current_database}`);
 
-    // 2. Start HTTP listener
-    const server = app.listen(env.port, () => {
+    // 2. Start HTTP listener on 0.0.0.0
+    const server = app.listen(env.port, '0.0.0.0', () => {
       console.log(`==============================================================================`);
-      console.log(`CarbonIQ Backend API running on http://localhost:${env.port}`);
+      console.log(`CarbonIQ Backend API listening on 0.0.0.0:${env.port}`);
       console.log(`Environment: ${env.env}`);
-      console.log(`API Base URL: http://localhost:${env.port}/api/v1`);
+      console.log(`API Base URL: /api/v1`);
       console.log(`==============================================================================`);
     });
 

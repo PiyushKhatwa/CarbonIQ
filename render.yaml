@@ -1,0 +1,34 @@
+services:
+  # 1. CarbonIQ Node.js Express Backend API
+  - type: web
+    name: carboniq-backend
+    runtime: node
+    plan: free
+    region: ohio
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: '*'
+      - key: AI_SERVICE_URL
+        value: https://carboniq-hm2c.onrender.com
+
+  # 2. CarbonIQ Python FastAPI AI Microservice
+  - type: web
+    name: carboniq-ai
+    runtime: python
+    plan: free
+    region: ohio
+    rootDir: ai-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false

@@ -31,7 +31,12 @@ function errorHandler(err, req, res, next) {
 }
 
 function notFoundHandler(req, res) {
-  return sendError(res, `Endpoint not found: ${req.method} ${req.originalUrl}`, 404, 'NOT_FOUND');
+  return sendError(
+    res,
+    `Endpoint not found: ${req.method} ${req.originalUrl}. Supported base prefix is /api/v1 (e.g. /api/v1/auth/register).`,
+    404,
+    'NOT_FOUND'
+  );
 }
 
 module.exports = {

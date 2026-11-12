@@ -47,16 +47,26 @@ if (env.env !== 'test') {
   app.use(morgan('dev'));
 }
 
-// System Health Check
+// System Health Check & Root Info
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
     service: 'CarbonIQ Backend API',
+    version: '1.0.0',
     timestamp: new Date().toISOString(),
   });
 });
 
-// Mount API v1 Routers
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'CarbonIQ Backend REST API',
+    endpoints: '/api/v1',
+    health: '/health',
+  });
+});
+
+// Mount API v1 Routers (Canonical)
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/workspaces', workspacesRoutes);
 app.use('/api/v1/organizations', organizationsRoutes);
@@ -65,6 +75,19 @@ app.use('/api/v1/activities', activitiesRoutes);
 app.use('/api/v1/emissions', emissionsRoutes);
 app.use('/api/v1/goals', goalsRoutes);
 app.use('/api/v1/recommendations', recommendationsRoutes);
+
+// Mount API Routers alias (for clients calling /api/...)
+app.use('/api/auth', authRoutes);
+app.use('/api/workspaces', workspacesRoutes);
+app.use('/api/organizations', organizationsRoutes);
+app.use('/api/taxonomy', taxonomyRoutes);
+app.use('/api/activities', activitiesRoutes);
+app.use('/api/emissions', emissionsRoutes);
+app.use('/api/goals', goalsRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
+
+// Direct root route alias for authentication
+app.use('/auth', authRoutes);
 
 // Error Handling
 app.use(notFoundHandler);
